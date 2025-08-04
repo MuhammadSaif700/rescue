@@ -52,6 +52,54 @@ app.get("/alerts", async (req, res) => {
   }
 });
 
+// Add this above the geocodeLocation function
+const geocodeQueue = [];
+let isProcessingQueue = false;
+
+async function processGeocodingQueue() {
+  if (isProcessingQueue || geocodeQueue.length === 0) return;
+
+  isProcessingQueue = true;
+
+  const { locationName, resolve } = geocodeQueue.shift();
+
+  try {
+    const encodedLocation = encodeURIComponent(locationName);
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodedLocation}&format=json&limit=1`;
+
+    const response = await fetch(url, {
+      headers: {
+        "User-Agent": "RescueEye-App/1.0",
+      },
+    });
+
+    const data = await response.json();
+
+    if (data && data.length > 0) {
+      resolve([parseFloat(data[0].lat), parseFloat(data[0].lon)]);
+    } else {
+      resolve([30.3753, 69.3451]); // Default if not found
+    }
+  } catch (error) {
+    console.error("Geocoding error:", error);
+    resolve([30.3753, 69.3451]); // Default on error
+  }
+
+  // Wait 1 second before processing next request
+  setTimeout(() => {
+    isProcessingQueue = false;
+    processGeocodingQueue();
+  }, 1000);
+}
+
+// Modified geocodeLocation function
+function geocodeLocation(locationName) {
+  return new Promise((resolve) => {
+    geocodeQueue.push({ locationName, resolve });
+    processGeocodingQueue();
+  });
+}
+
 // --- Alert Reporting ---
 app.post("/analyze", async (req, res) => {
   const { text, location, type, severity, peopleAffected, username } = req.body;
@@ -83,30 +131,11 @@ app.post("/analyze", async (req, res) => {
       break;
   }
 
-  // Extract coordinates from location or text
-  let coordinates = [30.3753, 69.3451]; // Default Pakistan coordinates
+  // Get location name
   let locationName = location || "Unknown Location";
 
-  // Try to extract known locations
-  if (
-    locationName.toLowerCase().includes("lahore") ||
-    text.toLowerCase().includes("lahore")
-  ) {
-    coordinates = [31.5656822, 74.3141829];
-    if (!location) locationName = "Lahore";
-  } else if (
-    locationName.toLowerCase().includes("islamabad") ||
-    text.toLowerCase().includes("islamabad")
-  ) {
-    coordinates = [33.6938118, 73.0651511];
-    if (!location) locationName = "Islamabad";
-  } else if (
-    locationName.toLowerCase().includes("karachi") ||
-    text.toLowerCase().includes("karachi")
-  ) {
-    coordinates = [24.8546842, 67.0207055];
-    if (!location) locationName = "Karachi";
-  }
+  // Get coordinates from location using geocoding
+  let coordinates = await geocodeLocation(locationName);
 
   // Create the emergency alert
   const alert = {
@@ -233,6 +262,31 @@ function generate_cultural_response(context_message) {
   // Return a culturally aware response
   return "Based on your preference for Italian cuisine and outdoor activities, here are culturally appropriate safety recommendations...";
 }
+
+// Qloo API proxy endpoint
+app.post("/proxy-qloo", async (req, res) => {
+  try {
+    const { apiKey, payload } = req.body;
+
+    const response = await fetch("https://api.qloo.com/v1/recommendations", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error("Qloo API Proxy Error:", error);
+    res.status(500).json({
+      error: "Failed to proxy request to Qloo API",
+      recommendations: [],
+    });
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on http://localhost:${PORT}`);

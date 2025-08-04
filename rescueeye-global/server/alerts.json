@@ -350,5 +350,149 @@
     "peopleAffected": 0,
     "icon": "⚠️",
     "reporter": "anonymous"
+  },
+  {
+    "id": 1754078852282,
+    "type": "medical",
+    "text": "fire",
+    "location": "karachi",
+    "coordinates": [
+      24.8546842,
+      67.0207055
+    ],
+    "timestamp": "2025-08-01T20:07:32.282Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1754078862315,
+    "type": "medical",
+    "text": "House fire in F-7 Islamabad, family trapped inside",
+    "location": "lahore",
+    "coordinates": [
+      31.5656822,
+      74.3141829
+    ],
+    "timestamp": "2025-08-01T20:07:42.315Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1754320049276,
+    "type": "other",
+    "text": "House fire in F-7 Islamabad, family trapped inside",
+    "location": "Multan",
+    "coordinates": [
+      33.6938118,
+      73.0651511
+    ],
+    "timestamp": "2025-08-04T15:07:29.276Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "⚠️",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1754320816042,
+    "type": "medical",
+    "text": "Fire",
+    "location": "sialkot",
+    "coordinates": [
+      30.3753,
+      69.3451
+    ],
+    "timestamp": "2025-08-04T15:20:16.042Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1754321474505,
+    "type": "other",
+    "text": "Building collapse in old city area",
+    "location": "sialkot",
+    "coordinates": [
+      30.3753,
+      69.3451
+    ],
+    "timestamp": "2025-08-04T15:31:14.505Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "⚠️",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1754329173871,
+    "type": "fire",
+    "text": "Medical emergency - heart attack at Centaurus Mall",
+    "location": "London",
+    "coordinates": [
+      30.3753,
+      69.3451
+    ],
+    "timestamp": "2025-08-04T17:39:33.871Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🔥",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1754333353934,
+    "type": "accident",
+    "text": "there is an emergency in MM Alam road , Lahore",
+    "location": "Lahore",
+    "coordinates": [
+      31.5656822,
+      74.3141829
+    ],
+    "timestamp": "2025-08-04T18:49:13.934Z",
+    "status": "pending",
+    "severity": "high",
+    "peopleAffected": 0,
+    "icon": "🚗",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1754337019941,
+    "type": "medical",
+    "text": "Flooding on I-8 roads, cars stuck",
+    "location": "berlin",
+    "coordinates": [
+      30.3753,
+      69.3451
+    ],
+    "timestamp": "2025-08-04T19:50:19.941Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1754337626662,
+    "type": "medical",
+    "text": "flood",
+    "location": "Berlin",
+    "coordinates": [
+      52.510885,
+      13.3989367
+    ],
+    "timestamp": "2025-08-04T20:00:26.662Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
   }
 ]
