@@ -1,14 +1,12 @@
 {
-  "name": "server",
+  "name": "rescueeye-server",
   "version": "1.0.0",
-  "description": "",
+  "description": "Backend server for RescueEye Global",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "axios": "^1.11.0",
     "body-parser": "^2.2.0",
@@ -18,5 +16,8 @@
     "node-fetch": "^2.7.0",
     "openai": "^5.11.0",
     "xml2js": "^0.6.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
   }
 }
