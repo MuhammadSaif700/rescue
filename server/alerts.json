@@ -494,5 +494,53 @@
     "peopleAffected": 0,
     "icon": "🚑",
     "reporter": "anonymous"
+  },
+  {
+    "id": 1754388301115,
+    "type": "medical",
+    "text": "flood",
+    "location": "sydeny",
+    "coordinates": [
+      30.3753,
+      69.3451
+    ],
+    "timestamp": "2025-08-05T10:05:01.115Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1754388330982,
+    "type": "fire",
+    "text": "flood",
+    "location": "berlin",
+    "coordinates": [
+      52.510885,
+      13.3989367
+    ],
+    "timestamp": "2025-08-05T10:05:30.982Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🔥",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1754388346249,
+    "type": "accident",
+    "text": "flood",
+    "location": "Sydney",
+    "coordinates": [
+      -33.8698439,
+      151.2082848
+    ],
+    "timestamp": "2025-08-05T10:05:46.249Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚗",
+    "reporter": "anonymous"
   }
 ]
