@@ -26,8 +26,8 @@ RescueEye Global is a comprehensive platform designed to:
 - **Emergency Reporting:** Instantly report incidents and view them on a live map.
 - **Location Status Check:** Get real-time weather and disaster info for any location.
 - **AI Weather Assistant:** Chatbot answers safety and weather questions, offers advice.
-- **Smart PrepKit™:** Custom emergency kit and evacuation plans for your household.
-- **Global Data Integration:** Uses OpenWeatherMap, GDACS, USGS, ReliefWeb, and OpenAI.
+- **Smart PrepKit™:** Custom emergency kit and evacuation plans for your household, with personalization powered by the Qloo API.
+- **Global Data Integration:** Uses OpenWeatherMap, GDACS, USGS, ReliefWeb, OpenAI, and Qloo.
 
 ---
 
@@ -37,7 +37,7 @@ RescueEye Global is a comprehensive platform designed to:
 
 - Node.js & npm
 - Python 3.x
-- API keys for OpenAI and OpenWeatherMap
+- API keys for OpenAI, OpenWeatherMap, and Qloo
 
 ### Installation & Startup
 
@@ -68,7 +68,7 @@ RescueEye Global is a comprehensive platform designed to:
 - **Frontend:** React, Leaflet (maps)
 - **Backend:** Express.js (Node)
 - **Chatbot:** Python (OpenAI integration)
-- **APIs:** OpenWeatherMap, OpenAI, disaster data sources
+- **APIs:** OpenWeatherMap, OpenAI, Qloo, disaster data sources
 
 ---
 
@@ -95,6 +95,7 @@ RescueEye Global is a comprehensive platform designed to:
 - [React Documentation](https://reactjs.org/)
 - [OpenWeatherMap API](https://openweathermap.org/api)
 - [OpenAI API](https://platform.openai.com/docs)
+- [Qloo API](https://qloo.com/docs/getting-started/)
 
 ---
 
