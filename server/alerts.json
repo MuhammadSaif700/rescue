@@ -558,5 +558,85 @@
     "peopleAffected": 0,
     "icon": "⚠️",
     "reporter": "anonymous"
+  },
+  {
+    "id": 1754484364206,
+    "type": "fire",
+    "text": "There is a huge fire near the times Square Area in New York city",
+    "location": "New York",
+    "coordinates": [
+      40.7127281,
+      -74.0060152
+    ],
+    "timestamp": "2025-08-06T12:46:04.206Z",
+    "status": "pending",
+    "severity": "high",
+    "peopleAffected": 0,
+    "icon": "🔥",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1754484745698,
+    "type": "medical",
+    "text": "flood",
+    "location": "Lahore",
+    "coordinates": [
+      31.5656822,
+      74.3141829
+    ],
+    "timestamp": "2025-08-06T12:52:25.698Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1754486083365,
+    "type": "fire",
+    "text": "There is a huge fire near the Times Square area in NewYork City",
+    "location": "New York",
+    "coordinates": [
+      40.7127281,
+      -74.0060152
+    ],
+    "timestamp": "2025-08-06T13:14:43.365Z",
+    "status": "pending",
+    "severity": "high",
+    "peopleAffected": 0,
+    "icon": "🔥",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1754486646026,
+    "type": "fire",
+    "text": "There is huge fire near the Times Square area in NewYork city",
+    "location": "New York",
+    "coordinates": [
+      40.7127281,
+      -74.0060152
+    ],
+    "timestamp": "2025-08-06T13:24:06.026Z",
+    "status": "pending",
+    "severity": "high",
+    "peopleAffected": 0,
+    "icon": "🔥",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1754590609466,
+    "type": "medical",
+    "text": "fire",
+    "location": "london",
+    "coordinates": [
+      51.4893335,
+      -0.1440551
+    ],
+    "timestamp": "2025-08-07T18:16:49.466Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
   }
 ]
