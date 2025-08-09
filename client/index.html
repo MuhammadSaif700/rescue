@@ -1205,7 +1205,7 @@
 
                 // --- Disaster API (your backend) ---
                 const disasterRes = await fetch(
-                  `http://localhost:5000/disaster?location=${encodeURIComponent(
+                  `https://34e92023-0b05-4d8b-9002-4cf5c781f1f0-00-2zlqfi3h8skfb.pike.replit.dev/disaster?location=${encodeURIComponent(
                     location
                   )}`
                 );
@@ -1527,18 +1527,21 @@
             const severity = document.getElementById("emergencySeverity").value;
             const username = "anonymous"; // Replace localStorage.getItem("username") || "anonymous";
 
-            const res = await fetch("http://localhost:5000/analyze", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                text: input,
-                location: location,
-                type: emergencyType,
-                severity: severity,
-                username,
-              }),
-              credentials: "include",
-            });
+            const res = await fetch(
+              "https://34e92023-0b05-4d8b-9002-4cf5c781f1f0-00-2zlqfi3h8skfb.pike.replit.dev/analyze",
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  text: input,
+                  location: location,
+                  type: emergencyType,
+                  severity: severity,
+                  username,
+                }),
+                credentials: "include",
+              }
+            );
 
             const alert = await res.json();
             alert.timestamp = new Date(alert.timestamp);
@@ -1683,11 +1686,14 @@
               const nextStatus = getNextStatus(alert.status || "pending");
               // Update status in backend
               try {
-                await fetch(`http://localhost:5000/alerts/${alert.id}`, {
-                  method: "PATCH",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ status: nextStatus }),
-                });
+                await fetch(
+                  `https://34e92023-0b05-4d8b-9002-4cf5c781f1f0-00-2zlqfi3h8skfb.pike.replit.dev/alerts/${alert.id}`,
+                  {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ status: nextStatus }),
+                  }
+                );
                 alert.status = nextStatus;
                 btn.previousElementSibling.textContent =
                   nextStatus.toUpperCase();
@@ -1835,7 +1841,9 @@
           this.updateMapMarkers();
 
           try {
-            const res = await fetch("http://localhost:5000/alerts");
+            const res = await fetch(
+              "https://34e92023-0b05-4d8b-9002-4cf5c781f1f0-00-2zlqfi3h8skfb.pike.replit.dev/alerts"
+            );
             const data = await res.json();
             data.forEach((alert) => {
               alert.timestamp = new Date(alert.timestamp);
@@ -1870,12 +1878,15 @@
             '<i class="fas fa-spinner fa-spin"></i> Checking...';
 
           try {
-            const res = await fetch("http://localhost:5000/check-location", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ location: locationInput }),
-              credentials: "include",
-            });
+            const res = await fetch(
+              "https://34e92023-0b05-4d8b-9002-4cf5c781f1f0-00-2zlqfi3h8skfb.pike.replit.dev/check-location",
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ location: locationInput }),
+                credentials: "include",
+              }
+            );
             const data = await res.json();
             if (res.ok) {
               locationStatusDiv.innerHTML = `
@@ -2335,7 +2346,7 @@ Format your response to be concise but culturally sensitive.
       async function fetchDisasterData(location) {
         try {
           const res = await fetch(
-            `http://localhost:5000/disaster?location=${encodeURIComponent(
+            `https://34e92023-0b05-4d8b-9002-4cf5c781f1f0-00-2zlqfi3h8skfb.pike.replit.dev/disaster?location=${encodeURIComponent(
               location
             )}`
           );

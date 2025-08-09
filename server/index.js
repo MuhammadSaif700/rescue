@@ -47,13 +47,23 @@ app.get("/", (req, res) => {
 });
 
 // ---- Get All Alerts ----
-app.get("/alerts", async (req, res) => {
-  try {
-    const data = await fs.readFile(ALERTS_FILE, "utf8");
-    res.json(JSON.parse(data));
-  } catch (error) {
-    console.error("Error reading alerts:", error);
-    res.status(500).json({ error: "Failed to load alerts" });
+// app.get("/alerts", async (req, res) => {
+//   try {
+//     const data = await fs.readFile(ALERTS_FILE, "utf8");
+//     res.json(JSON.parse(data));
+//   } catch (error) {
+//     console.error("Error reading alerts:", error);
+//     res.status(500).json({ error: "Failed to load alerts" });
+//   }
+// });
+
+app.get("/alerts/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+  const alert = alerts.find((a) => a.id === id);
+  if (alert) {
+    res.json(alert);
+  } else {
+    res.status(404).json({ message: "Alert not found" });
   }
 });
 

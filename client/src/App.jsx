@@ -43,7 +43,7 @@ function App() {
     if (!chatMessage) return;
     setChatReply("AI is thinking...");
     try {
-      const response = await fetch("http://localhost:5001/chatbot", {
+      const response = await fetch("https://34e92023-0b05-4d8b-9002-4cf5c781f1f0-00-2zlqfi3h8skfb.pike.replit.dev/chatbot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: chatMessage }),
@@ -59,7 +59,7 @@ function App() {
 
   const handleAnalyze = async () => {
     try {
-      const response = await fetch("http://localhost:5000/analyze", {
+      const response = await fetch("https://34e92023-0b05-4d8b-9002-4cf5c781f1f0-00-2zlqfi3h8skfb.pike.replit.dev/analyze", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -77,7 +77,7 @@ function App() {
 
   const fetchAlerts = async () => {
     try {
-      const res = await fetch("http://localhost:5000/alerts");
+      const res = await fetch("https://34e92023-0b05-4d8b-9002-4cf5c781f1f0-00-2zlqfi3h8skfb.pike.replit.dev/alerts");
       const data = await res.json();
       setAlerts(data.reverse()); // newest first
     } catch (error) {

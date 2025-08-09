@@ -5,7 +5,13 @@ const fetch = require("node-fetch");
 const { OpenAI } = require("openai");
 
 const app = express();
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+app.use(
+  cors({
+    origin:
+      "https://34e92023-0b05-4d8b-9002-4cf5c781f1f0-00-2zlqfi3h8skfb.pike.replit.dev",
+    credentials: true,
+  })
+);
 app.use(bodyParser.json());
 
 const openai = new OpenAI({

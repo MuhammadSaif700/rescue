@@ -24,13 +24,16 @@ async function analyze() {
   const inputText = document.getElementById("inputText").value;
   const responseBox = document.getElementById("responseBox");
 
-  const response = await fetch("http://localhost:5000/analyze", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ text: inputText }),
-  });
+  const response = await fetch(
+    "https://34e92023-0b05-4d8b-9002-4cf5c781f1f0-00-2zlqfi3h8skfb.pike.replit.dev/analyze",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ text: inputText }),
+    }
+  );
 
   const data = await response.json();
   console.log("Response:", data);
