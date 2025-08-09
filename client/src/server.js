@@ -133,4 +133,8 @@ app.post("/ai-chat", async (req, res) => {
   }
 });
 
-app.listen(5000, () => console.log("Backend running on http://localhost:5000"));
+app.listen(5000, () =>
+  console.log(
+    "Backend running on https://34e92023-0b05-4d8b-9002-4cf5c781f1f0-00-2zlqfi3h8skfb.pike.replit.dev"
+  )
+);

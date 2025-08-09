@@ -13,15 +13,19 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // ---- Middleware ----
+const allowedOrigins = [
+  "http://localhost:5173", // dev mode
+  "https://6897a849e394e90c19ffb884--rescueeye.netlify.app", // Netlify live site
+];
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "http://localhost:3000",
-      "http://localhost:3001",
-      "http://localhost:3002",
-    ],
-    credentials: true,
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error("Not allowed by CORS"));
+    },
   })
 );
 
