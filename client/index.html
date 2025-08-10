@@ -1914,7 +1914,7 @@ Format your response to be concise but culturally sensitive.
 
           try {
             // We'll use our existing chatbot backend but pass the enhanced context
-            const response = await fetch("http://localhost:5001/chatbot", {
+            const response = await fetch(`${API_BASE}/chatbot`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
@@ -2170,6 +2170,7 @@ Format your response to be concise but culturally sensitive.
 • Have a disaster preparedness kit ready
 • Know evacuation routes from your area
 • Follow instructions from local authorities
+
 • Check on neighbors, especially elderly or those with special needs
 • Keep your phone charged and have backup power sources
 • Document any property damage with photos`;
