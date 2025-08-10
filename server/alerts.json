@@ -638,5 +638,21 @@
     "peopleAffected": 0,
     "icon": "🚑",
     "reporter": "anonymous"
+  },
+  {
+    "id": 1754848613319,
+    "type": "medical",
+    "text": "House fire in F-7 Islamabad, family trapped inside",
+    "location": "LAhore",
+    "coordinates": [
+      30.3753,
+      69.3451
+    ],
+    "timestamp": "2025-08-10T17:56:53.319Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
   }
 ]

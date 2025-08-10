@@ -1,8 +1,7 @@
 // server/index.js
 
 const express = require("express");
-const cors = require("cors");
-const bodyParser = require("body-parser");
+const cors = require("cors"); // 1. Import the cors package
 const fs = require("fs/promises");
 const path = require("path");
 const fetch = require("node-fetch");
@@ -10,27 +9,18 @@ const xml2js = require("xml2js");
 require("dotenv").config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
+const API_BASE = "http://localhost:5001";
 
-// ---- Middleware ----
-const allowedOrigins = [
-  "http://localhost:5173", // dev mode
-  "https://6897a849e394e90c19ffb884--rescueeye.netlify.app", // Netlify live site
-];
-
+// 2. Use the cors middleware
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-      return callback(new Error("Not allowed by CORS"));
-    },
+    origin: true, // allow any origin
+    credentials: true, // keep cookies if you ever use them
   })
 );
 
 app.use(express.json());
-app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, "public")));
 
 // ---- File Setup ----
@@ -51,23 +41,29 @@ app.get("/", (req, res) => {
 });
 
 // ---- Get All Alerts ----
-// app.get("/alerts", async (req, res) => {
-//   try {
-//     const data = await fs.readFile(ALERTS_FILE, "utf8");
-//     res.json(JSON.parse(data));
-//   } catch (error) {
-//     console.error("Error reading alerts:", error);
-//     res.status(500).json({ error: "Failed to load alerts" });
-//   }
-// });
+app.get("/alerts", async (req, res) => {
+  try {
+    const data = await fs.readFile(ALERTS_FILE, "utf8");
+    res.json(JSON.parse(data));
+  } catch (error) {
+    res.status(500).json({ error: "Failed to read alerts" });
+  }
+});
 
-app.get("/alerts/:id", (req, res) => {
-  const id = parseInt(req.params.id);
-  const alert = alerts.find((a) => a.id === id);
-  if (alert) {
-    res.json(alert);
-  } else {
-    res.status(404).json({ message: "Alert not found" });
+app.get("/alerts/:id", async (req, res) => {
+  try {
+    const data = await fs.readFile(ALERTS_FILE, "utf8");
+    const alerts = JSON.parse(data);
+    const id = parseInt(req.params.id);
+    // Note: Your alert IDs are timestamps (e.g., Date.now()), so they are numbers.
+    const alert = alerts.find((a) => a.id === id);
+    if (alert) {
+      res.json(alert);
+    } else {
+      res.status(404).json({ message: "Alert not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Failed to read alerts" });
   }
 });
 

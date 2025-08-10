@@ -1123,6 +1123,8 @@
     <!-- Scripts -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+      const API_BASE = "http://localhost:5001";
+
       class RescueEyeApp {
         constructor() {
           this.map = null;
@@ -1205,7 +1207,7 @@
 
                 // --- Disaster API (your backend) ---
                 const disasterRes = await fetch(
-                  `https://34e92023-0b05-4d8b-9002-4cf5c781f1f0-00-2zlqfi3h8skfb.pike.replit.dev/disaster?location=${encodeURIComponent(
+                  `${API_BASE}/disaster?location=${encodeURIComponent(
                     location
                   )}`
                 );
@@ -1376,51 +1378,6 @@
               }
             });
 
-          // Generate recommendations button
-          if (document.getElementById("generateRecommendations")) {
-            document
-              .getElementById("generateRecommendations")
-              .addEventListener("click", async () => {
-                const resultsDiv = document.getElementById(
-                  "recommendationsResult"
-                );
-
-                // Show loading state
-                resultsDiv.innerHTML = `
-                <div style="text-align: center; padding: 2rem 0;">
-                  <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #ff6b6b; margin-bottom: 1rem;"></i>
-                  <p>Generating your personalized recommendations...</p>
-                </div>
-              `;
-
-                // Simulate loading time
-                setTimeout(() => {
-                  const activeBtn = document.querySelector(".rec-btn.active");
-                  const recType = activeBtn ? activeBtn.id : "emergencyKit";
-
-                  // Show recommendations based on button type
-                  if (recType === "emergencyKit") {
-                    resultsDiv.innerHTML = this.generateEmergencyKitHTML();
-                  } else if (recType === "evacuationPlan") {
-                    resultsDiv.innerHTML = this.generateEvacuationPlanHTML();
-                  } else if (recType === "safetyTips") {
-                    resultsDiv.innerHTML = this.generateSafetyTipsHTML();
-                  }
-                }, 1000);
-              });
-          }
-
-          // Tab buttons for recommendation types
-          document.querySelectorAll(".rec-btn").forEach((btn) => {
-            btn.addEventListener("click", () => {
-              // Update active button
-              document
-                .querySelectorAll(".rec-btn")
-                .forEach((b) => b.classList.remove("active"));
-              btn.classList.add("active");
-            });
-          });
-
           // IMPORTANT: Fix navigation links
           document.querySelectorAll(".nav-link").forEach((link) => {
             link.addEventListener("click", () => {
@@ -1450,40 +1407,6 @@
               }
             });
           });
-
-          // Save profile button
-          document
-            .getElementById("saveProfile")
-            .addEventListener("click", () => {
-              // Collect profile data
-              const profile = {
-                householdSize: document.getElementById("householdSize").value,
-                hasPets: document.getElementById("hasPets").value,
-                specialNeeds: document.getElementById("specialNeeds").value,
-                locationType: document.getElementById("locationType").value,
-                disasterTypes: Array.from(
-                  document.querySelectorAll(
-                    'input[name="disasterType"]:checked'
-                  )
-                ).map((el) => el.value),
-              };
-
-              // Save to localStorage
-              localStorage.setItem("userPrepProfile", JSON.stringify(profile));
-
-              // Show success message
-              this.showSuccessMessage(
-                "Your preparation profile has been saved!"
-              );
-
-              // Update the button to show it's saved
-              const saveBtn = document.getElementById("saveProfile");
-              saveBtn.innerHTML = '<i class="fas fa-check"></i> Profile Saved!';
-              setTimeout(() => {
-                saveBtn.innerHTML =
-                  '<i class="fas fa-save"></i> Save My Profile';
-              }, 2000);
-            });
         }
 
         async processDisasterReport() {
@@ -1527,21 +1450,18 @@
             const severity = document.getElementById("emergencySeverity").value;
             const username = "anonymous"; // Replace localStorage.getItem("username") || "anonymous";
 
-            const res = await fetch(
-              "https://34e92023-0b05-4d8b-9002-4cf5c781f1f0-00-2zlqfi3h8skfb.pike.replit.dev/analyze",
-              {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  text: input,
-                  location: location,
-                  type: emergencyType,
-                  severity: severity,
-                  username,
-                }),
-                credentials: "include",
-              }
-            );
+            const res = await fetch(`${API_BASE}/analyze`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                text: input,
+                location: location,
+                type: emergencyType,
+                severity: severity,
+                username,
+              }),
+              credentials: "include",
+            });
 
             const alert = await res.json();
             alert.timestamp = new Date(alert.timestamp);
@@ -1686,14 +1606,11 @@
               const nextStatus = getNextStatus(alert.status || "pending");
               // Update status in backend
               try {
-                await fetch(
-                  `https://34e92023-0b05-4d8b-9002-4cf5c781f1f0-00-2zlqfi3h8skfb.pike.replit.dev/alerts/${alert.id}`,
-                  {
-                    method: "PATCH",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ status: nextStatus }),
-                  }
-                );
+                await fetch(`${API_BASE}/alerts/${alert.id}`, {
+                  method: "PATCH",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ status: nextStatus }),
+                });
                 alert.status = nextStatus;
                 btn.previousElementSibling.textContent =
                   nextStatus.toUpperCase();
@@ -1841,9 +1758,7 @@
           this.updateMapMarkers();
 
           try {
-            const res = await fetch(
-              "https://34e92023-0b05-4d8b-9002-4cf5c781f1f0-00-2zlqfi3h8skfb.pike.replit.dev/alerts"
-            );
+            const res = await fetch(`${API_BASE}/alerts`);
             const data = await res.json();
             data.forEach((alert) => {
               alert.timestamp = new Date(alert.timestamp);
@@ -1878,15 +1793,12 @@
             '<i class="fas fa-spinner fa-spin"></i> Checking...';
 
           try {
-            const res = await fetch(
-              "https://34e92023-0b05-4d8b-9002-4cf5c781f1f0-00-2zlqfi3h8skfb.pike.replit.dev/check-location",
-              {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ location: locationInput }),
-                credentials: "include",
-              }
-            );
+            const res = await fetch(`${API_BASE}/check-location`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ location: locationInput }),
+              credentials: "include",
+            });
             const data = await res.json();
             if (res.ok) {
               locationStatusDiv.innerHTML = `
@@ -2069,224 +1981,17 @@ Format your response to be concise but culturally sensitive.
             `;
           }
         }
-
-        generateEmergencyKitHTML() {
-          return `
-    <div style="padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 12px;">
-      <h3 style="color: #ff6b6b; margin-bottom: 1rem;">Your Emergency Kit Recommendations</h3>
-      
-      <h4 style="color: #fff; margin-top: 1rem; margin-bottom: 0.5rem;">High Priority Items</h4>
-      <ul style="color: #e0e0e0; padding-left: 1.5rem;">
-        <li>Water (1 gallon per person, per day, for at least 3 days)</li>
-        <li>Non-perishable food (at least a 3-day supply)</li>
-        <li>Flashlight and extra batteries</li>
-        <li>First aid kit</li>
-        <li>Cell phone with chargers and backup battery</li>
-      </ul>
-      
-      <h4 style="color: #fff; margin-top: 1rem; margin-bottom: 0.5rem;">Medium Priority Items</h4>
-      <ul style="color: #e0e0e0; padding-left: 1.5rem;">
-        <li>Battery-powered or hand-crank radio</li>
-        <li>Whistle to signal for help</li>
-        <li>Dust mask for filtering contaminated air</li>
-        <li>Plastic sheeting and duct tape</li>
-        <li>Moist towelettes, garbage bags and plastic ties</li>
-      </ul>
-      
-      <div style="margin-top: 1rem; font-size: 0.9rem; color: #a0a0a0; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
-        Based on your profile information. Update your profile for more personalized recommendations.
-      </div>
-    </div>
-  `;
-        }
-
-        generateEvacuationPlanHTML() {
-          return `
-    <div style="padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 12px;">
-      <h3 style="color: #ffa726; margin-bottom: 1rem;">Your Evacuation Plan</h3>
-      
-      <ol style="color: #e0e0e0; padding-left: 1.5rem;">
-        <li style="margin-bottom: 0.5rem;">Identify multiple evacuation routes from your home</li>
-        <li style="margin-bottom: 0.5rem;">Choose two meeting places: one near your home and one outside your neighborhood</li>
-        <li style="margin-bottom: 0.5rem;">Always keep at least half a tank of gas in your car</li>
-        <li style="margin-bottom: 0.5rem;">Prepare a "go bag" with essential items</li>
-        <li style="margin-bottom: 0.5rem;">Plan for pets - many shelters don't accept animals</li>
-        <li style="margin-bottom: 0.5rem;">Know how to shut off utilities at main switches</li>
-        <li style="margin-bottom: 0.5rem;">Practice evacuation drills with all household members</li>
-      </ol>
-      
-      <div style="margin-top: 1rem; font-size: 0.9rem; color: #a0a0a0; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
-        Keep your evacuation plan accessible and review it regularly with everyone in your household.
-      </div>
-    </div>
-  `;
-        }
-
-        generateSafetyTipsHTML() {
-          return `
-    <div style="padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 12px;">
-      <h3 style="color: #4ecdc4; margin-bottom: 1rem;">Safety Tips</h3>
-      
-      <div style="margin-bottom: 1.5rem;">
-        <h4 style="color: #45b7d1; margin-bottom: 0.5rem;">Flood Safety</h4>
-        <ul style="color: #e0e0e0; padding-left: 1.5rem;">
-          <li>Never walk, swim, or drive through flood waters</li>
-          <li>Stay off bridges over fast-moving water</li>
-          <li>Move to higher ground or a higher floor</li>
-        </ul>
-      </div>
-      
-      <div style="margin-bottom: 1.5rem;">
-        <h4 style="color: #ff6b6b; margin-bottom: 0.5rem;">Fire Safety</h4>
-        <ul style="color: #e0e0e0; padding-left: 1.5rem;">
-          <li>Install smoke alarms on every level of your home</li>
-          <li>Create and practice a fire escape plan</li>
-          <li>If trapped, close doors, cover vents, call for help</li>
-        </ul>
-      </div>
-      
-      <div style="margin-bottom: 1.5rem;">
-        <h4 style="color: #ffa726; margin-bottom: 0.5rem;">Earthquake Safety</h4>
-        <ul style="color: #e0e0e0; padding-left: 1.5rem;">
-          <li>Drop, Cover, and Hold On</li>
-          <li>Stay away from windows, outside walls, and doorways</li>
-          <li>If outdoors, move to a clear area away from buildings</li>
-        </ul>
-      </div>
-      
-      <div style="margin-top: 1rem; font-size: 0.9rem; color: #a0a0a0; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
-        These safety tips are general guidelines. Always follow instructions from local authorities during emergencies.
-      </div>
-    </div>
-  `;
-        }
       }
 
       const app = new RescueEyeApp();
 
-      // New code for personalized recommendations
-      document.getElementById("emergencyKit").onclick = () => {
-        const profile = JSON.parse(localStorage.getItem("userPrepProfile"));
-        let recommendations = `
-🔧 **Emergency Kit Recommendations**:
-- First Aid Kit
-- Flashlight with extra batteries
-- Non-perishable food and water
-- Whistle to signal for help
-- Dust mask to help filter contaminated air
-- Plastic sheeting and duct tape to shelter in place
-- Moist towelettes, garbage bags, and plastic ties for personal sanitation
-- Manual can opener for food
-- Local maps
-- Cell phone with chargers and a backup battery
-        `;
-
-        // Add personalized items based on profile
-        if (profile.hasPets === "dogs") {
-          recommendations += `
-🐶 **For Dog Owners**:
-- Dog food and water
-- Leash, collar, and ID tags
-- Dog bed or blanket
-- Medications and medical records
-- Recent photo of your dog
-          `;
-        } else if (profile.hasPets === "cats") {
-          recommendations += `
-🐱 **For Cat Owners**:
-- Cat food and water
-- Litter and litter box
-- Cat bed or blanket
-- Medications and medical records
-- Recent photo of your cat
-          `;
-        } else if (profile.hasPets === "both") {
-          recommendations += `
-🐶🐱 **For Dog and Cat Owners**:
-- Enough pet food and water for at least three days
-- Leashes, collars, and ID tags for all pets
-- Pet beds or blankets
-- Medications and medical records for all pets
-- Recent photos of all your pets
-          `;
-        }
-
-        if (profile.specialNeeds === "mobility") {
-          recommendations += `
-♿ **For Individuals with Mobility Issues**:
-- Cane, walker, or wheelchair
-- Medications and medical records
-- Emergency contact information
-- Personal hygiene items
-          `;
-        } else if (profile.specialNeeds === "medical") {
-          recommendations += `
-⚕️ **For Individuals with Medical Requirements**:
-- Extra supply of medications
-- Medical equipment (e.g., CPAP machine, insulin pump)
-- List of medical conditions and allergies
-- Emergency contact information
-          `;
-        } else if (profile.specialNeeds === "dietary") {
-          recommendations += `
-🥗 **For Individuals with Special Dietary Needs**:
-- Non-perishable food that meets your dietary restrictions
-- List of foods to avoid
-- Emergency contact information
-          `;
-        } else if (profile.specialNeeds === "children") {
-          recommendations += `
-👶 **For Families with Young Children**:
-- Diapers, wipes, and changing pad
-- Baby formula, bottles, and nipples
-- Pacifiers and comfort items
-- Baby blanket and clothing
-- Emergency contact information
-          `;
-        } else if (profile.specialNeeds === "elderly") {
-          recommendations += `
-👵 **For Individuals Caring for the Elderly**:
-- Extra supply of medications
-- Medical equipment (e.g., hearing aids, glasses)
-- List of medical conditions and allergies
-- Emergency contact information
-          `;
-        }
-
-        // Display recommendations
-        document.getElementById("recommendationsResult").innerHTML = `
-          <div style="padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 12px;">
-      <h3 style="color: #ff6b6b; margin-bottom: 1rem;">Your Emergency Kit Recommendations</h3>
-      
-      <h4 style="color: #fff; margin-top: 1rem; margin-bottom: 0.5rem;">High Priority Items</h4>
-      <ul style="color: #e0e0e0; padding-left: 1.5rem;">
-        <li>Water (1 gallon per person, per day, for at least 3 days)</li>
-        <li>Non-perishable food (at least a 3-day supply)</li>
-        <li>Flashlight and extra batteries</li>
-        <li>First aid kit</li>
-        <li>Cell phone with chargers and backup battery</li>
-      </ul>
-      
-      <h4 style="color: #fff; margin-top: 1rem; margin-bottom: 0.5rem;">Medium Priority Items</h4>
-      <ul style="color: #e0e0e0; padding-left: 1.5rem;">
-        <li>Battery-powered or hand-crank radio</li>
-        <li>Whistle to signal for help</li>
-        <li>Dust mask for filtering contaminated air</li>
-        <li>Plastic sheeting and duct tape</li>
-        <li>Moist towelettes, garbage bags and plastic ties</li>
-      </ul>
-      
-      <div style="margin-top: 1rem; font-size: 0.9rem; color: #a0a0a0; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
-        Based on your profile information. Update your profile for more personalized recommendations.
-      </div>
-    </div>
-        `;
-      };
-
       // AI Assistance button (Get AI Recommendations)
-      document.getElementById("aiAssistBtn").onclick = async () => {
-        // Delete this entire function
-      };
+      const aiAssistBtn = document.getElementById("aiAssistBtn");
+      if (aiAssistBtn) {
+        aiAssistBtn.onclick = async () => {
+          // Function content here
+        };
+      }
 
       // Extract location from user query
       function extractLocationFromQuery(query) {
@@ -2346,9 +2051,7 @@ Format your response to be concise but culturally sensitive.
       async function fetchDisasterData(location) {
         try {
           const res = await fetch(
-            `https://34e92023-0b05-4d8b-9002-4cf5c781f1f0-00-2zlqfi3h8skfb.pike.replit.dev/disaster?location=${encodeURIComponent(
-              location
-            )}`
+            `${API_BASE}/disaster?location=${encodeURIComponent(location)}`
           );
           return await res.json();
         } catch (e) {
