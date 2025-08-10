@@ -1,7 +1,7 @@
 // server/index.js
 
 const express = require("express");
-const cors = require("cors"); // 1. Import the cors package
+const cors = require("cors"); // Import the cors package
 const fs = require("fs/promises");
 const path = require("path");
 const fetch = require("node-fetch");
@@ -12,11 +12,14 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 const API_BASE = "http://localhost:5001";
 
-// 2. Use the cors middleware
+// Use CORS middleware
 app.use(
   cors({
-    origin: true, // allow any origin
-    credentials: true, // keep cookies if you ever use them
+    origin: [
+      "https://6897acabf0bed0f966531509--rescueeye.netlify.app", // Your Netlify frontend
+      "http://localhost:5173", // Your local development environment
+    ],
+    credentials: true,
   })
 );
 

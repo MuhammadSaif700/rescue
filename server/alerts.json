@@ -654,5 +654,21 @@
     "peopleAffected": 0,
     "icon": "🚑",
     "reporter": "anonymous"
+  },
+  {
+    "id": 1754852613465,
+    "type": "medical",
+    "text": "ehted",
+    "location": "thde",
+    "coordinates": [
+      30.3753,
+      69.3451
+    ],
+    "timestamp": "2025-08-10T19:03:33.465Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
   }
 ]
