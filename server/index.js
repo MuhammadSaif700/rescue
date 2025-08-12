@@ -1,7 +1,7 @@
 // server/index.js
 
 const express = require("express");
-const cors = require("cors"); // Import the cors package
+const cors = require("cors");
 const fs = require("fs/promises");
 const path = require("path");
 const xml2js = require("xml2js");
@@ -9,18 +9,21 @@ require("dotenv").config();
 
 const app = express();
 const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-const API_BASE = "http://localhost:5001";
 
-// Use CORS middleware
+// Use correct API base (localhost for dev, Railway URL for production)
+const API_BASE =
+  process.env.NODE_ENV === "production"
+    ? `https://${
+        process.env.RAILWAY_STATIC_URL || `your-railway-app-name.up.railway.app`
+      }`
+    : `http://localhost:${PORT}`;
+
+// Allowed origins from env
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || "").split(",");
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps or curl)
-      if (!origin) return callback(null, true);
+      if (!origin) return callback(null, true); // Allow non-browser requests
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
@@ -44,9 +47,13 @@ const ALERTS_FILE = path.join(__dirname, "alerts.json");
     console.log("✅ Created empty alerts.json file");
   }
 })();
+
+// ---- Weather Endpoint ----
 app.get("/weather", async (req, res) => {
   try {
-    const response = await fetch(url); // This is fine — inside async function
+    const url =
+      "https://api.open-meteo.com/v1/forecast?latitude=30.3753&longitude=69.3451&current_weather=true";
+    const response = await fetch(url);
     const data = await response.json();
     res.json(data);
   } catch (error) {
@@ -75,7 +82,6 @@ app.get("/alerts/:id", async (req, res) => {
     const data = await fs.readFile(ALERTS_FILE, "utf8");
     const alerts = JSON.parse(data);
     const id = parseInt(req.params.id);
-    // Note: Your alert IDs are timestamps (e.g., Date.now()), so they are numbers.
     const alert = alerts.find((a) => a.id === id);
     if (alert) {
       res.json(alert);
@@ -93,8 +99,8 @@ let isProcessingQueue = false;
 
 async function processGeocodingQueue() {
   if (isProcessingQueue || geocodeQueue.length === 0) return;
-
   isProcessingQueue = true;
+
   const { locationName, resolve } = geocodeQueue.shift();
 
   try {
@@ -109,11 +115,11 @@ async function processGeocodingQueue() {
     if (data && data.length > 0) {
       resolve([parseFloat(data[0].lat), parseFloat(data[0].lon)]);
     } else {
-      resolve([30.3753, 69.3451]); // Default
+      resolve([30.3753, 69.3451]);
     }
   } catch (error) {
     console.error("Geocoding error:", error);
-    resolve([30.3753, 69.3451]); // Default
+    resolve([30.3753, 69.3451]);
   }
 
   setTimeout(() => {
@@ -183,7 +189,6 @@ app.get("/disaster", async (req, res) => {
 
   let statuses = [];
 
-  // GDACS RSS
   try {
     const rssRes = await fetch("https://www.gdacs.org/xml/rss.xml");
     const rssText = await rssRes.text();
@@ -195,7 +200,6 @@ app.get("/disaster", async (req, res) => {
     if (found) statuses.push(found.title[0]);
   } catch {}
 
-  // USGS Earthquake
   try {
     const usgsRes = await fetch(
       "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&limit=20"
@@ -207,7 +211,6 @@ app.get("/disaster", async (req, res) => {
     if (eq) statuses.push(eq.properties.title);
   } catch {}
 
-  // ReliefWeb API
   try {
     const rwRes = await fetch(
       `https://api.reliefweb.int/v1/disasters?appname=rescueeye&profile=full&preset=latest&query[value]=${encodeURIComponent(
@@ -289,5 +292,5 @@ app.get("*", (req, res) => {
 
 // ---- Start Server ----
 app.listen(PORT, () => {
-  console.log(`🚀 Server is running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
