@@ -1449,6 +1449,9 @@
             const severity = document.getElementById("emergencySeverity").value;
             const username = "anonymous"; // Replace localStorage.getItem("username") || "anonymous";
 
+            // Get coordinates for the location
+            const coordinates = await this.geocodeLocation(location);
+
             const res = await fetch(`${API_BASE}/analyze`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -1458,12 +1461,22 @@
                 type: emergencyType,
                 severity: severity,
                 username,
+                coordinates: coordinates, // Add coordinates to the request
               }),
               credentials: "include",
             });
 
             const alert = await res.json();
             alert.timestamp = new Date(alert.timestamp);
+
+            // Ensure we use our geocoded coordinates if the server didn't provide any
+            if (
+              !alert.coordinates ||
+              !Array.isArray(alert.coordinates) ||
+              alert.coordinates.length !== 2
+            ) {
+              alert.coordinates = coordinates;
+            }
 
             // Add emergency icon based on type
             if (!alert.icon) {
@@ -1505,6 +1518,33 @@
           submitBtn.innerHTML =
             '<i class="fas fa-exclamation-circle"></i> Report Emergency';
           loadingOverlay.style.display = "none";
+        }
+
+        // Add this new geocoding function
+        async geocodeLocation(locationString) {
+          try {
+            // Use OpenStreetMap's Nominatim service for geocoding
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+                locationString
+              )}`
+            );
+            const data = await response.json();
+
+            // Check if we got any results
+            if (data && data.length > 0) {
+              // Return coordinates in [lat, lon] format
+              return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+            } else {
+              console.warn("Location not found:", locationString);
+              // Return a default location if geocoding fails
+              return [30.3753, 69.3451]; // Default to Pakistan coordinates
+            }
+          } catch (error) {
+            console.error("Geocoding error:", error);
+            // Return a default location if geocoding fails
+            return [30.3753, 69.3451]; // Default to Pakistan coordinates
+          }
         }
 
         addMapMarker(alert) {
@@ -2135,43 +2175,10 @@ Format your response to be concise but culturally sensitive.
 🚨 TORNADO SAFETY ADVICE:
 • Seek shelter immediately in a basement or interior room
 • Stay away from windows and doors
-• Cover yourself with blankets or mattress if possible
-• If in a vehicle, do not try to outrun a tornado
-• If outside with no shelter, lie flat in a nearby ditch
-• Watch for flying debris - most tornado injuries come from debris
-• Keep emergency supplies ready
-• Stay tuned to emergency broadcasts for warnings`,
-
-          tsunami: `
-🚨 TSUNAMI SAFETY ADVICE:
-• Move inland and to higher ground immediately
-• Follow evacuation orders without delay
-• Stay away from the beach and waterfront areas
-• If you can see the wave, you're too close to escape
-• A tsunami is a series of waves - the danger may last for hours
-• Wait for official "all clear" before returning to low-lying areas
-• Be alert to signs like sudden sea level changes or roaring sounds
-• If caught in tsunami waters, grab onto something that floats`,
-        };
-
-        // Check for partial matches in disaster status text
-        for (const [key, advice] of Object.entries(adviceMap)) {
-          if (disasterType.toLowerCase().includes(key)) {
-            return advice;
-          }
-        }
-
-        return `
-🔔 GENERAL SAFETY ADVICE:
-• Stay tuned to emergency broadcasts
-• Keep emergency contact numbers handy
-• Have a disaster preparedness kit ready
-• Know evacuation routes from your area
-• Follow instructions from local authorities
-
-• Check on neighbors, especially elderly or those with special needs
+• Cover yourself with a heavy blanket or mattress
 • Keep your phone charged and have backup power sources
-• Document any property damage with photos`;
+• Document any property damage with photos`,
+        };
       }
 
       // Replace the current generateAIResponse function with this enhanced version
