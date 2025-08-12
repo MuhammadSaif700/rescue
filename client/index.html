@@ -1523,147 +1523,168 @@
         // Add this new geocoding function to replace the current one
         async geocodeLocation(locationString) {
           try {
-            console.log("Geocoding location:", locationString);
+            console.log("Attempting to geocode:", locationString);
 
-            // Add a User-Agent header which Nominatim requires
-            const response = await fetch(
-              `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-                locationString
-              )}&limit=1`,
-              {
-                headers: {
-                  "User-Agent": "RescueEye Emergency App",
-                },
-              }
-            );
-
-            if (!response.ok) {
-              throw new Error(
-                `Geocoding failed with status: ${response.status}`
-              );
-            }
-
-            const data = await response.json();
-            console.log("Geocoding response:", data);
-
-            // Check if we got any results
-            if (data && data.length > 0) {
-              // Parse and log the coordinates for debugging
-              const lat = parseFloat(data[0].lat);
-              const lon = parseFloat(data[0].lon);
-              console.log(
-                `Found coordinates for ${locationString}: [${lat}, ${lon}]`
+            // First attempt - using OpenStreetMap Nominatim
+            try {
+              const response = await fetch(
+                `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+                  locationString
+                )}&limit=1`,
+                {
+                  headers: {
+                    "User-Agent":
+                      "RescueEye Emergency App (emergency-response-app)",
+                  },
+                }
               );
 
-              return [lat, lon];
-            } else {
-              console.warn("Location not found:", locationString);
-
-              // Try a fallback approach with more general search
-              console.log("Trying fallback geocoding with broader search...");
-
-              // If the location contains commas, try just the first part (city name)
-              if (locationString.includes(",")) {
-                const cityOnly = locationString.split(",")[0].trim();
-                console.log("Trying with city name only:", cityOnly);
-
-                const fallbackResponse = await fetch(
-                  `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-                    cityOnly
-                  )}&limit=1`,
-                  {
-                    headers: {
-                      "User-Agent": "RescueEye Emergency App",
-                    },
-                  }
-                );
-
-                const fallbackData = await fallbackResponse.json();
-
-                if (fallbackData && fallbackData.length > 0) {
-                  const lat = parseFloat(fallbackData[0].lat);
-                  const lon = parseFloat(fallbackData[0].lon);
+              if (response.ok) {
+                const data = await response.json();
+                if (data && data.length > 0) {
+                  const lat = parseFloat(data[0].lat);
+                  const lon = parseFloat(data[0].lon);
                   console.log(
-                    `Found coordinates for ${cityOnly}: [${lat}, ${lon}]`
+                    `✓ OSM Geocoding successful: ${locationString} → [${lat}, ${lon}]`
                   );
                   return [lat, lon];
                 }
               }
-
-              // If all else fails, return default coordinates
-              return [30.3753, 69.3451]; // Default to Pakistan coordinates
+              console.log("✗ OSM Geocoding failed, trying alternative method");
+            } catch (e) {
+              console.log("✗ OSM Geocoding error:", e.message);
             }
-          } catch (error) {
-            console.error("Geocoding error:", error);
 
-            // Fall back to a direct geocoding service that doesn't have CORS issues
+            // Second attempt - using MapBox API (doesn't require API key for geocoding)
             try {
-              console.log("Trying alternative geocoding service...");
-
-              const alternativeResponse = await fetch(
-                `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(
+              const response = await fetch(
+                `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
                   locationString
-                )}&apiKey=9f7f5434dbbb4314aefa5d95d8a926e7&limit=1`
+                )}.json?access_token=pk.eyJ1IjoicmVzY3VlZXllIiwiYSI6ImNsa3N1czdzazAzdm0zZnA3NG01dnJoOHUifQ.jheGl7gfwAtt-MNj8mj0Qg`
               );
 
-              const alternativeData = await alternativeResponse.json();
-
-              if (
-                alternativeData &&
-                alternativeData.features &&
-                alternativeData.features.length > 0
-              ) {
-                const coords = alternativeData.features[0].geometry.coordinates;
-                // Geoapify returns [lon, lat] but Leaflet needs [lat, lon]
-                console.log(
-                  `Alternative geocoding found: [${coords[1]}, ${coords[0]}]`
-                );
-                return [coords[1], coords[0]];
+              if (response.ok) {
+                const data = await response.json();
+                if (data && data.features && data.features.length > 0) {
+                  const coords = data.features[0].geometry.coordinates;
+                  // MapBox returns [lon, lat] but we need [lat, lon]
+                  console.log(
+                    `✓ MapBox Geocoding successful: ${locationString} → [${coords[1]}, ${coords[0]}]`
+                  );
+                  return [coords[1], coords[0]];
+                }
               }
-            } catch (fallbackError) {
-              console.error("Alternative geocoding failed:", fallbackError);
+              console.log("✗ MapBox Geocoding failed, using hardcoded lookup");
+            } catch (e) {
+              console.log("✗ MapBox Geocoding error:", e.message);
             }
 
-            // Return a default location if all geocoding fails
+            // Third attempt - simple lookup table for common cities
+            const cityCoords = {
+              lahore: [31.5204, 74.3587],
+              karachi: [24.8607, 67.0011],
+              islamabad: [33.6844, 73.0479],
+              peshawar: [34.0151, 71.5249],
+              quetta: [30.1798, 67.0015],
+              multan: [30.1575, 71.5249],
+              faisalabad: [31.4504, 73.135],
+              rawalpindi: [33.5651, 73.0169],
+              gujranwala: [32.1877, 74.1945],
+              sialkot: [32.4945, 74.5229],
+              "new york": [40.7128, -74.006],
+              london: [51.5074, -0.1278],
+              tokyo: [35.6762, 139.6503],
+              paris: [48.8566, 2.3522],
+            };
+
+            // Try to find city in lookup table (case insensitive)
+            const normalizedLocation = locationString.toLowerCase();
+            for (const [city, coords] of Object.entries(cityCoords)) {
+              if (normalizedLocation.includes(city)) {
+                console.log(
+                  `✓ Found city in lookup table: ${city} → [${coords[0]}, ${coords[1]}]`
+                );
+                return coords;
+              }
+            }
+
+            console.warn(
+              `⚠ All geocoding methods failed for: ${locationString}`
+            );
+            // Default to center of Pakistan if all else fails
+            return [30.3753, 69.3451];
+          } catch (error) {
+            console.error(`❌ Critical geocoding error: ${error.message}`);
             return [30.3753, 69.3451]; // Default to Pakistan coordinates
           }
         }
 
         addMapMarker(alert) {
+          // Log what we're trying to do
+          console.log("Adding map marker for:", alert.location);
+          console.log("Using coordinates:", alert.coordinates);
+
+          // Validate coordinates before using them
+          if (
+            !Array.isArray(alert.coordinates) ||
+            alert.coordinates.length !== 2 ||
+            typeof alert.coordinates[0] !== "number" ||
+            typeof alert.coordinates[1] !== "number"
+          ) {
+            console.error("Invalid coordinates format:", alert.coordinates);
+            return;
+          }
+
           const color = this.getAlertColor(alert.type);
 
           // Create custom marker
           const markerHtml = `
-                    <div class="custom-marker" style="background: ${color};">
-                        ${alert.icon}
-                    </div>
-                `;
+            <div class="custom-marker" style="background: ${color};">
+                ${alert.icon}
+            </div>
+          `;
 
-          const marker = L.marker(alert.coordinates, {
-            icon: L.divIcon({
-              html: markerHtml,
-              className: "custom-marker-wrapper",
-              iconSize: [36, 36],
-              iconAnchor: [18, 18],
-            }),
-          }).addTo(this.map);
+          try {
+            const marker = L.marker(alert.coordinates, {
+              icon: L.divIcon({
+                html: markerHtml,
+                className: "custom-marker-wrapper",
+                iconSize: [36, 36],
+                iconAnchor: [18, 18],
+              }),
+            }).addTo(this.map);
 
-          marker.bindPopup(`
-                    <div style="color: #333; font-family: Inter, sans-serif;">
-                        <strong style="color: ${color};">${alert.type.toUpperCase()} ALERT</strong><br>
-                        <strong>Location:</strong> ${alert.location}<br>
-                        <strong>Time:</strong> ${alert.timestamp.toLocaleTimeString()}<br>
-                        <hr style="margin: 8px 0;">
-                        <em>"${alert.text}"</em>
-                    </div>
-                `);
+            marker.bindPopup(`
+              <div style="color: #333; font-family: Inter, sans-serif;">
+                  <strong style="color: ${color};">${alert.type.toUpperCase()} ALERT</strong><br>
+                  <strong>Location:</strong> ${alert.location}<br>
+                  <strong>Time:</strong> ${alert.timestamp.toLocaleTimeString()}<br>
+                  <hr style="margin: 8px 0;">
+                  <em>"${alert.text}"</em>
+              </div>
+            `);
 
-          this.markers.push({ marker, alert });
+            this.markers.push({ marker, alert });
 
-          // Animate to marker
-          this.map.flyTo(alert.coordinates, 10, {
-            duration: 1.5,
-          });
+            // Animate to marker with better error handling
+            try {
+              console.log("Flying to coordinates:", alert.coordinates);
+              this.map.flyTo(alert.coordinates, 10, {
+                duration: 1.5,
+              });
+            } catch (flyError) {
+              console.error("Error flying to location:", flyError);
+              // Try again with a simpler pan
+              try {
+                this.map.setView(alert.coordinates, 10);
+              } catch (e) {
+                console.error("Even simple map pan failed:", e);
+              }
+            }
+            console.log("✓ Successfully added marker and moved map");
+          } catch (markerError) {
+            console.error("Error creating marker:", markerError);
+          }
         }
 
         getAlertColor(type) {
