@@ -1621,19 +1621,35 @@
 
         addMapMarker(alert) {
           // Log what we're trying to do
-          console.log("Adding map marker for:", alert.location);
-          console.log("Using coordinates:", alert.coordinates);
+          console.log(
+            "%cADDING MARKER",
+            "background: green; color: white; padding: 3px;"
+          );
+          console.log("Location:", alert.location);
+          console.log("Coordinates:", alert.coordinates);
 
-          // Validate coordinates before using them
           if (
             !Array.isArray(alert.coordinates) ||
-            alert.coordinates.length !== 2 ||
-            typeof alert.coordinates[0] !== "number" ||
-            typeof alert.coordinates[1] !== "number"
+            alert.coordinates.length !== 2
           ) {
             console.error("Invalid coordinates format:", alert.coordinates);
             return;
           }
+
+          // Force the coordinates to be numbers (important for Leaflet)
+          const lat = parseFloat(alert.coordinates[0]);
+          const lng = parseFloat(alert.coordinates[1]);
+
+          if (isNaN(lat) || isNaN(lng)) {
+            console.error(
+              "Coordinates are not valid numbers:",
+              alert.coordinates
+            );
+            return;
+          }
+
+          const validCoordinates = [lat, lng];
+          console.log("Parsed coordinates:", validCoordinates);
 
           const color = this.getAlertColor(alert.type);
 
@@ -1645,7 +1661,8 @@
           `;
 
           try {
-            const marker = L.marker(alert.coordinates, {
+            // Add marker to map with validated coordinates
+            const marker = L.marker(validCoordinates, {
               icon: L.divIcon({
                 html: markerHtml,
                 className: "custom-marker-wrapper",
@@ -1655,6 +1672,7 @@
             }).addTo(this.map);
 
             marker.bindPopup(`
+
               <div style="color: #333; font-family: Inter, sans-serif;">
                   <strong style="color: ${color};">${alert.type.toUpperCase()} ALERT</strong><br>
                   <strong>Location:</strong> ${alert.location}<br>
@@ -1666,22 +1684,30 @@
 
             this.markers.push({ marker, alert });
 
-            // Animate to marker with better error handling
-            try {
-              console.log("Flying to coordinates:", alert.coordinates);
-              this.map.flyTo(alert.coordinates, 10, {
-                duration: 1.5,
-              });
-            } catch (flyError) {
-              console.error("Error flying to location:", flyError);
-              // Try again with a simpler pan
-              try {
-                this.map.setView(alert.coordinates, 10);
-              } catch (e) {
-                console.error("Even simple map pan failed:", e);
-              }
-            }
-            console.log("✓ Successfully added marker and moved map");
+            // Set view on marker with a FIXED zoom level for consistency
+            console.log("Setting map view to:", validCoordinates);
+
+            // Use setView instead of flyTo for more reliable placement
+            this.map.setView(validCoordinates, 11);
+
+            // Add a visual indicator for debugging (will show where the center is)
+            const centerMarker = L.circleMarker(validCoordinates, {
+              radius: 5,
+              color: "white",
+              fillColor: "#f03",
+              fillOpacity: 0.5,
+              weight: 1,
+            }).addTo(this.map);
+
+            // Remove the center indicator after 3 seconds
+            setTimeout(() => {
+              this.map.removeLayer(centerMarker);
+            }, 3000);
+
+            console.log(
+              "%cMarker added successfully",
+              "background: green; color: white; padding: 3px;"
+            );
           } catch (markerError) {
             console.error("Error creating marker:", markerError);
           }
