@@ -4,21 +4,29 @@ const express = require("express");
 const cors = require("cors"); // Import the cors package
 const fs = require("fs/promises");
 const path = require("path");
-const fetch = require("node-fetch");
+const response = await fetch(url);
 const xml2js = require("xml2js");
 require("dotenv").config();
 
 const app = express();
 const PORT = process.env.PORT || 5001;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 const API_BASE = "http://localhost:5001";
 
 // Use CORS middleware
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || "").split(",");
 app.use(
   cors({
-    origin: [
-      "https://6897acabf0bed0f966531509--rescueeye.netlify.app", // Your Netlify frontend
-      "http://localhost:5173", // Your local development environment
-    ],
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error("Not allowed by CORS"));
+    },
     credentials: true,
   })
 );

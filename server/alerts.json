@@ -670,5 +670,37 @@
     "peopleAffected": 0,
     "icon": "🚑",
     "reporter": "anonymous"
+  },
+  {
+    "id": 1754857875781,
+    "type": "other",
+    "text": "jdxf",
+    "location": "ydxf",
+    "coordinates": [
+      30.3753,
+      69.3451
+    ],
+    "timestamp": "2025-08-10T20:31:15.781Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "⚠️",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1754857897427,
+    "type": "other",
+    "text": "fjx",
+    "location": "rsu",
+    "coordinates": [
+      30.3753,
+      69.3451
+    ],
+    "timestamp": "2025-08-10T20:31:37.427Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "⚠️",
+    "reporter": "anonymous"
   }
 ]
