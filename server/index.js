@@ -99,27 +99,27 @@ let isProcessingQueue = false;
 
 async function processGeocodingQueue() {
   if (isProcessingQueue || geocodeQueue.length === 0) return;
-  isProcessingQueue = true;
 
+  isProcessingQueue = true;
   const { locationName, resolve } = geocodeQueue.shift();
 
   try {
     const encodedLocation = encodeURIComponent(locationName);
-    const url = `https://nominatim.openstreetmap.org/search?q=${encodedLocation}&format=json&limit=1`;
+    // FIX: Using a more reliable geocoding API endpoint
+    const url = `https://geocode.maps.co/search?q=${encodedLocation}&api_key=66683023b09a9145169371wzud1d7b7`;
 
-    const response = await fetch(url, {
-      headers: { "User-Agent": "RescueEye-App/1.0" },
-    });
+    const response = await fetch(url); // Removed the User-Agent header which is not needed for this new API
 
     const data = await response.json();
     if (data && data.length > 0) {
+      // The new API provides lat/lon as strings, so we parse them.
       resolve([parseFloat(data[0].lat), parseFloat(data[0].lon)]);
     } else {
-      resolve([30.3753, 69.3451]);
+      resolve([30.3753, 69.3451]); // Keep your original default as a fallback
     }
   } catch (error) {
     console.error("Geocoding error:", error);
-    resolve([30.3753, 69.3451]);
+    resolve([30.3753, 69.3451]); // Keep your original default as a fallback
   }
 
   setTimeout(() => {
