@@ -4,7 +4,6 @@ const express = require("express");
 const cors = require("cors"); // Import the cors package
 const fs = require("fs/promises");
 const path = require("path");
-const response = await fetch(url);
 const xml2js = require("xml2js");
 require("dotenv").config();
 
@@ -45,6 +44,16 @@ const ALERTS_FILE = path.join(__dirname, "alerts.json");
     console.log("✅ Created empty alerts.json file");
   }
 })();
+app.get("/weather", async (req, res) => {
+  try {
+    const response = await fetch(url); // This is fine — inside async function
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Something went wrong" });
+  }
+});
 
 // ---- Routes ----
 app.get("/", (req, res) => {
