@@ -1448,8 +1448,7 @@
             ).dataset.type;
             const severity = document.getElementById("emergencySeverity").value;
             const username = "anonymous"; // Replace localStorage.getItem("username") || "anonymous";
-
-            const res = await fetch("http://localhost:5000/analyze", {
+            const res = await fetch(`${API_BASE}/analyze`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
