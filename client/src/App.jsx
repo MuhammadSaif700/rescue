@@ -86,26 +86,28 @@ function App() {
   };
 
   // Update the function that handles map markers
-  const addMarkerForAlert = async (alert) => {
-    try {
-      // Use OpenStreetMap Nominatim geocoding service to get coordinates from city name
-      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(alert.location)}`);
-      const data = await response.json();
-      
-      if (data && data.length > 0) {
-        // Get coordinates from the first result
-        const lat = parseFloat(data[0].lat);
-        const lng = parseFloat(data[0].lon);
-        
-        // Create marker with these coordinates
-        const marker = new L.marker([lat, lng]).addTo(map);
-        marker.bindPopup(`<b>${alert.title}</b><br>${alert.description}`).openPopup();
-      } else {
-        console.error("Location not found:", alert.location);
-      }
-    } catch (error) {
-      console.error("Error geocoding location:", error);
-    }
+  const addAlertToMap = (alert) => {
+    // Use OpenStreetMap Nominatim service for proper geocoding
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(alert.location)}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data && data.length > 0) {
+          // Get coordinates from the first result
+          const lat = parseFloat(data[0].lat);
+          const lng = parseFloat(data[0].lon);
+          
+          console.log(`Geocoded ${alert.location} to: ${lat}, ${lng}`);
+          
+          // Create marker at the correct location
+          const marker = L.marker([lat, lng]).addTo(map);
+          marker.bindPopup(`<b>${alert.title}</b><br>${alert.description}<br>Location: ${alert.location}`);
+        } else {
+          console.error(`Could not geocode location: ${alert.location}`);
+        }
+      })
+      .catch(error => {
+        console.error("Error geocoding location:", error);
+      });
   }
 
   useEffect(() => {
