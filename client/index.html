@@ -1449,10 +1449,7 @@
             const severity = document.getElementById("emergencySeverity").value;
             const username = "anonymous"; // Replace localStorage.getItem("username") || "anonymous";
 
-            // Get coordinates for the location
-            const coordinates = await this.geocodeLocation(location);
-
-            const res = await fetch(`${API_BASE}/analyze`, {
+            const res = await fetch("http://localhost:5000/analyze", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
@@ -1461,22 +1458,12 @@
                 type: emergencyType,
                 severity: severity,
                 username,
-                coordinates: coordinates, // Add coordinates to the request
               }),
               credentials: "include",
             });
 
             const alert = await res.json();
             alert.timestamp = new Date(alert.timestamp);
-
-            // Ensure we use our geocoded coordinates if the server didn't provide any
-            if (
-              !alert.coordinates ||
-              !Array.isArray(alert.coordinates) ||
-              alert.coordinates.length !== 2
-            ) {
-              alert.coordinates = coordinates;
-            }
 
             // Add emergency icon based on type
             if (!alert.icon) {
@@ -1520,199 +1507,42 @@
           loadingOverlay.style.display = "none";
         }
 
-        // Add this new geocoding function to replace the current one
-        async geocodeLocation(locationString) {
-          try {
-            console.log("Attempting to geocode:", locationString);
-
-            // First attempt - using OpenStreetMap Nominatim
-            try {
-              const response = await fetch(
-                `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-                  locationString
-                )}&limit=1`,
-                {
-                  headers: {
-                    "User-Agent":
-                      "RescueEye Emergency App (emergency-response-app)",
-                  },
-                }
-              );
-
-              if (response.ok) {
-                const data = await response.json();
-                if (data && data.length > 0) {
-                  const lat = parseFloat(data[0].lat);
-                  const lon = parseFloat(data[0].lon);
-                  console.log(
-                    `✓ OSM Geocoding successful: ${locationString} → [${lat}, ${lon}]`
-                  );
-                  return [lat, lon];
-                }
-              }
-              console.log("✗ OSM Geocoding failed, trying alternative method");
-            } catch (e) {
-              console.log("✗ OSM Geocoding error:", e.message);
-            }
-
-            // Second attempt - using MapBox API (doesn't require API key for geocoding)
-            try {
-              const response = await fetch(
-                `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-                  locationString
-                )}.json?access_token=pk.eyJ1IjoicmVzY3VlZXllIiwiYSI6ImNsa3N1czdzazAzdm0zZnA3NG01dnJoOHUifQ.jheGl7gfwAtt-MNj8mj0Qg`
-              );
-
-              if (response.ok) {
-                const data = await response.json();
-                if (data && data.features && data.features.length > 0) {
-                  const coords = data.features[0].geometry.coordinates;
-                  // MapBox returns [lon, lat] but we need [lat, lon]
-                  console.log(
-                    `✓ MapBox Geocoding successful: ${locationString} → [${coords[1]}, ${coords[0]}]`
-                  );
-                  return [coords[1], coords[0]];
-                }
-              }
-              console.log("✗ MapBox Geocoding failed, using hardcoded lookup");
-            } catch (e) {
-              console.log("✗ MapBox Geocoding error:", e.message);
-            }
-
-            // Third attempt - simple lookup table for common cities
-            const cityCoords = {
-              lahore: [31.5204, 74.3587],
-              karachi: [24.8607, 67.0011],
-              islamabad: [33.6844, 73.0479],
-              peshawar: [34.0151, 71.5249],
-              quetta: [30.1798, 67.0015],
-              multan: [30.1575, 71.5249],
-              faisalabad: [31.4504, 73.135],
-              rawalpindi: [33.5651, 73.0169],
-              gujranwala: [32.1877, 74.1945],
-              sialkot: [32.4945, 74.5229],
-              "new york": [40.7128, -74.006],
-              london: [51.5074, -0.1278],
-              tokyo: [35.6762, 139.6503],
-              paris: [48.8566, 2.3522],
-            };
-
-            // Try to find city in lookup table (case insensitive)
-            const normalizedLocation = locationString.toLowerCase();
-            for (const [city, coords] of Object.entries(cityCoords)) {
-              if (normalizedLocation.includes(city)) {
-                console.log(
-                  `✓ Found city in lookup table: ${city} → [${coords[0]}, ${coords[1]}]`
-                );
-                return coords;
-              }
-            }
-
-            console.warn(
-              `⚠ All geocoding methods failed for: ${locationString}`
-            );
-            // Default to center of Pakistan if all else fails
-            return [30.3753, 69.3451];
-          } catch (error) {
-            console.error(`❌ Critical geocoding error: ${error.message}`);
-            return [30.3753, 69.3451]; // Default to Pakistan coordinates
-          }
-        }
-
         addMapMarker(alert) {
-          // Log what we're trying to do
-          console.log(
-            "%cADDING MARKER",
-            "background: green; color: white; padding: 3px;"
-          );
-          console.log("Location:", alert.location);
-          console.log("Coordinates:", alert.coordinates);
-
-          if (
-            !Array.isArray(alert.coordinates) ||
-            alert.coordinates.length !== 2
-          ) {
-            console.error("Invalid coordinates format:", alert.coordinates);
-            return;
-          }
-
-          // Force the coordinates to be numbers (important for Leaflet)
-          const lat = parseFloat(alert.coordinates[0]);
-          const lng = parseFloat(alert.coordinates[1]);
-
-          if (isNaN(lat) || isNaN(lng)) {
-            console.error(
-              "Coordinates are not valid numbers:",
-              alert.coordinates
-            );
-            return;
-          }
-
-          const validCoordinates = [lat, lng];
-          console.log("Parsed coordinates:", validCoordinates);
-
           const color = this.getAlertColor(alert.type);
 
           // Create custom marker
           const markerHtml = `
-            <div class="custom-marker" style="background: ${color};">
-                ${alert.icon}
-            </div>
-          `;
+                    <div class="custom-marker" style="background: ${color};">
+                        ${alert.icon}
+                    </div>
+                `;
 
-          try {
-            // Add marker to map with validated coordinates
-            const marker = L.marker(validCoordinates, {
-              icon: L.divIcon({
-                html: markerHtml,
-                className: "custom-marker-wrapper",
-                iconSize: [36, 36],
-                iconAnchor: [18, 18],
-              }),
-            }).addTo(this.map);
+          const marker = L.marker(alert.coordinates, {
+            icon: L.divIcon({
+              html: markerHtml,
+              className: "custom-marker-wrapper",
+              iconSize: [36, 36],
+              iconAnchor: [18, 18],
+            }),
+          }).addTo(this.map);
 
-            marker.bindPopup(`
+          marker.bindPopup(`
+                    <div style="color: #333; font-family: Inter, sans-serif;">
+                        <strong style="color: ${color};">${alert.type.toUpperCase()} ALERT</strong><br>
+                        <strong>Location:</strong> ${alert.location}<br>
+                        <strong>Time:</strong> ${alert.timestamp.toLocaleTimeString()}<br>
+                        <hr style="margin: 8px 0;">
+                        <em>"${alert.text}"</em>
+                    </div>
+                `);
 
-              <div style="color: #333; font-family: Inter, sans-serif;">
-                  <strong style="color: ${color};">${alert.type.toUpperCase()} ALERT</strong><br>
-                  <strong>Location:</strong> ${alert.location}<br>
-                  <strong>Time:</strong> ${alert.timestamp.toLocaleTimeString()}<br>
-                  <hr style="margin: 8px 0;">
-                  <em>"${alert.text}"</em>
-              </div>
-            `);
+          this.markers.push({ marker, alert });
 
-            this.markers.push({ marker, alert });
-
-            // Set view on marker with a FIXED zoom level for consistency
-            console.log("Setting map view to:", validCoordinates);
-
-            // Use setView instead of flyTo for more reliable placement
-            this.map.setView(validCoordinates, 11);
-
-            // Add a visual indicator for debugging (will show where the center is)
-            const centerMarker = L.circleMarker(validCoordinates, {
-              radius: 5,
-              color: "white",
-              fillColor: "#f03",
-              fillOpacity: 0.5,
-              weight: 1,
-            }).addTo(this.map);
-
-            // Remove the center indicator after 3 seconds
-            setTimeout(() => {
-              this.map.removeLayer(centerMarker);
-            }, 3000);
-
-            console.log(
-              "%cMarker added successfully",
-              "background: green; color: white; padding: 3px;"
-            );
-          } catch (markerError) {
-            console.error("Error creating marker:", markerError);
-          }
+          // Animate to marker
+          this.map.flyTo(alert.coordinates, 10, {
+            duration: 1.5,
+          });
         }
-
         getAlertColor(type) {
           const colors = {
             fire: "linear-gradient(135deg, #ff6b6b, #ee5a24)",
