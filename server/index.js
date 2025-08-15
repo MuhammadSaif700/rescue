@@ -104,28 +104,56 @@ async function processGeocodingQueue() {
   const { locationName, resolve } = geocodeQueue.shift();
 
   try {
+    console.log(`Geocoding location: ${locationName}`);
+    // First try Nominatim for better global coverage
+    try {
+      const nominatimUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+        locationName
+      )}&limit=1`;
+      const nominatimResponse = await fetch(nominatimUrl, {
+        headers: {
+          "User-Agent": "RescueEye Emergency App",
+        },
+      });
+
+      if (nominatimResponse.ok) {
+        const data = await nominatimResponse.json();
+        if (data && data.length > 0) {
+          console.log(
+            `Found coordinates for ${locationName}: [${data[0].lat}, ${data[0].lon}]`
+          );
+          return resolve([parseFloat(data[0].lat), parseFloat(data[0].lon)]);
+        }
+      }
+    } catch (nominatimError) {
+      console.error("Nominatim geocoding failed:", nominatimError);
+    }
+
+    // Fallback to Maps.co API
     const encodedLocation = encodeURIComponent(locationName);
-    // FIX: Using a more reliable geocoding API endpoint
-    const url = `https://geocode.maps.co/search?q=${encodedLocation}&api_key=66683023b09a9145169371wzud1d7b7`;
+    const url = `https://geocode.maps.co/search?q=${encodedLocation}`;
 
-    const response = await fetch(url); // Removed the User-Agent header which is not needed for this new API
-
+    const response = await fetch(url);
     const data = await response.json();
+
     if (data && data.length > 0) {
-      // The new API provides lat/lon as strings, so we parse them.
+      console.log(
+        `Maps.co found coordinates for ${locationName}: [${data[0].lat}, ${data[0].lon}]`
+      );
       resolve([parseFloat(data[0].lat), parseFloat(data[0].lon)]);
     } else {
-      resolve([30.3753, 69.3451]); // Keep your original default as a fallback
+      console.warn(`No coordinates found for ${locationName}, using default`);
+      resolve(null); // Return null instead of default coordinates
     }
   } catch (error) {
     console.error("Geocoding error:", error);
-    resolve([30.3753, 69.3451]); // Keep your original default as a fallback
+    resolve(null); // Return null instead of default coordinates
+  } finally {
+    setTimeout(() => {
+      isProcessingQueue = false;
+      processGeocodingQueue();
+    }, 1000);
   }
-
-  setTimeout(() => {
-    isProcessingQueue = false;
-    processGeocodingQueue();
-  }, 1000);
 }
 
 function geocodeLocation(locationName) {
@@ -137,7 +165,15 @@ function geocodeLocation(locationName) {
 
 // ---- Create Alert ----
 app.post("/analyze", async (req, res) => {
-  const { text, location, type, severity, peopleAffected, username } = req.body;
+  const {
+    text,
+    location,
+    coordinates: clientCoords,
+    type,
+    severity,
+    peopleAffected,
+    username,
+  } = req.body;
 
   if (!text) {
     return res.status(400).json({ error: "Description is required" });
@@ -154,7 +190,29 @@ app.post("/analyze", async (req, res) => {
   const icon = icons[emergencyType] || "⚠️";
 
   const locationName = location || "Unknown Location";
-  const coordinates = await geocodeLocation(locationName);
+
+  // First try using client-provided coordinates if they exist
+  let coordinates;
+  if (
+    clientCoords &&
+    Array.isArray(clientCoords) &&
+    clientCoords.length === 2
+  ) {
+    console.log(
+      `Using client-provided coordinates for ${locationName}: [${clientCoords[0]}, ${clientCoords[1]}]`
+    );
+    coordinates = clientCoords;
+  } else {
+    // Otherwise geocode on the server
+    console.log(`Geocoding location on server: ${locationName}`);
+    coordinates = await geocodeLocation(locationName);
+
+    // If geocoding fails, don't use default Pakistan coordinates
+    if (!coordinates) {
+      console.log(`Geocoding failed for ${locationName}, using world center`);
+      coordinates = [0, 0]; // Use world center instead of Pakistan
+    }
+  }
 
   const alert = {
     id: Date.now(),
