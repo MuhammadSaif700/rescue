@@ -19,11 +19,16 @@ const API_BASE =
     : `http://localhost:${PORT}`;
 
 // Allowed origins from env
-const allowedOrigins = (process.env.ALLOWED_ORIGINS || "").split(",");
+const allowedOrigins = [
+  "https://rescueeye.me",
+  "https://www.rescueeye.me",
+  "http://localhost:3000", // for local testing
+];
+
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin) return callback(null, true); // Allow non-browser requests
+      if (!origin) return callback(null, true); // mobile apps, curl, etc.
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
