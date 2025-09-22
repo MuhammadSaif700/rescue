@@ -1,25 +1,35 @@
 const express = require("express");
 const cors = require("cors");
-const bodyParser = require("body-parser");
+const fs = require("fs/promises");
+const path = require("path");
 const fetch = require("node-fetch");
-const { OpenAI } = require("openai");
+const xml2js = require("xml2js");
+require("dotenv").config();
 
 const app = express();
+const PORT = process.env.PORT || 5000;
+
+// CORS configuration for Render
+const allowedOrigins = [
+  "https://rescueeye.netlify.app",
+  "http://localhost:5173",
+  "http://localhost:3000",
+];
+
 app.use(
   cors({
-    origin:
-      "https://34e92023-0b05-4d8b-9002-4cf5c781f1f0-00-2zlqfi3h8skfb.pike.replit.dev",
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error("Not allowed by CORS"));
+    },
     credentials: true,
   })
 );
-app.use(bodyParser.json());
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-}); // Replace with your key
-
-let alerts = [];
-let users = [{ username: "admin", password: "admin" }];
+app.use(express.json());
+app.use(express.static(path.join(__dirname, "..", "client")));
 
 // --- Disaster API ---
 app.get("/disaster", async (req, res) => {

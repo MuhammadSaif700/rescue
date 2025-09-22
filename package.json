@@ -1,18 +1,17 @@
 {
-  "name": "rescueeye-global",
+  "name": "rescueeye-backend",
   "version": "1.0.0",
-  "description": "AI-Powered Disaster Detection System",
+  "description": "RescueEye Backend API",
+  "main": "index.js",
   "scripts": {
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "client": "cd client && npm run dev",
-    "server": "cd server && npm start",
-    "build": "cd client && npm install && npm run build",
-    "start": "cd server && node index.js",
-    "install-deps": "npm install && cd client && npm install && cd ../server && npm install"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "dependencies": {
-    "@coinbase/onchainkit": "^0.38.19",
-    "concurrently": "^7.6.0",
-    "cors": "^2.8.5"
+    "express": "^4.18.0",
+    "cors": "^2.8.5",
+    "node-fetch": "^2.7.0",
+    "xml2js": "^0.4.23",
+    "dotenv": "^16.0.0"
   }
 }

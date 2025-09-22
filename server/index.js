@@ -20,6 +20,7 @@ const API_BASE =
 
 // Allowed origins from env
 const allowedOrigins = [
+  "https://rescueeye.netlify.app", // add this
   "https://rescueeye.me",
   "https://www.rescueeye.me",
   "http://localhost:3000", // for local testing
