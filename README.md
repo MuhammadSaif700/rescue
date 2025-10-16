@@ -80,8 +80,7 @@ Open http://localhost:3000 in your browser.
 ## Demo
 
 - <video width="600" controls>
-    <source src="demo/Demo.mp4" type="video/mp4">
-    Your browser does not support the video tag.
+    <source src="https://github.com/user-attachments/assets/77bab367-0c9f-4b75-a96d-f6a9bb7b7d37" type="video/mp4">
   </video>
 
 ## Contributing
