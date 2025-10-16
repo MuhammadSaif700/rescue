@@ -79,7 +79,10 @@ Open http://localhost:3000 in your browser.
 
 ## Demo
 
-- <video src="./demo/Demo.mp4" controls width="720"></video>
+- <video width="600" controls>
+    <source src="demo/Demo.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
 
 ## Contributing
 
