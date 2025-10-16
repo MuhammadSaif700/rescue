@@ -77,7 +77,7 @@ Open http://localhost:3000 in your browser.
 - AI chatbot for weather questions
 - Basic emergency preparedness tips
 
-## Demo
+## 🎥 Demo
 
 - <video width="600" controls>
     <source src="demo/Demo.mp4" type="video/mp4">
