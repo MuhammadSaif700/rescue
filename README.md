@@ -172,11 +172,11 @@ Once everything is set up, open your web browser and go to:
 
 ### 🎥 Demo
 
-Demo.mp4 (add your GIF/file link here)
+[![Watch the video](demo-thumbnail.png)](https://github.com/user-attachments/assets/77bab367-0c9f-4b75-a96d-f6a9bb7b7d37)
 
-### 🤝 Contributing
+<!-- ### 🤝 Contributing
 
-If you have ideas or suggestions for improvements, we'd love to hear them! Feel free to fork the repository, submit a pull request, or report any issues you encounter.
+If you have ideas or suggestions for improvements, we'd love to hear them! Feel free to fork the repository, submit a pull request, or report any issues you encounter. -->
 
 ### 📄 License
 
