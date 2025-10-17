@@ -95,9 +95,9 @@ MIT License - use this code however you want. -->
 
 A community-oriented platform that simplifies the process of reporting emergencies and provides real-time updates on disaster and weather conditions.
 
-### 🌍 What is this project about?
+### 🌍 About the Project
 
-RescueEye Global was created to help people easily report emergencies and stay informed during critical times. When crises occur, it can be difficult to find accurate information or share what’s happening in your area. This project is all about making that process smoother and more reliable.
+RescueEye Global is created to help people easily report emergencies and stay informed during critical times. When crises occur, it can be difficult to find accurate information or share what’s happening in your area. This project is all about making that process smoother and more reliable.
 
 ### ✅ What you can do with it
 
@@ -150,8 +150,6 @@ Once everything is set up, open your web browser and go to:
 **APIs used:**
 
 - **OpenWeatherMap**: For accurate weather information.
-- **OpenAI**: Powers the interactive chatbot.
-- **Qloo**: Provides personalization features.
 - **GDACS / USGS / ReliefWeb**: Sources for real-time disaster alerts.
 
 ### 📁 Project Structure
