@@ -5,10 +5,15 @@ const cors = require("cors");
 const fs = require("fs/promises");
 const path = require("path");
 const xml2js = require("xml2js");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 require("dotenv").config();
 
 const app = express();
 const PORT = process.env.PORT || 5001;
+
+// Initialize Google AI with your API key
+const GOOGLE_AI_API_KEY = "AIzaSyDnT3q5dy1LtB6oRIift5aMPdUqGEsRNRI";
+const genAI = new GoogleGenerativeAI(GOOGLE_AI_API_KEY);
 
 // Use correct API base (localhost for dev, Railway URL for production)
 const API_BASE =
@@ -24,6 +29,8 @@ const allowedOrigins = [
   "https://rescueeye.me",
   "https://www.rescueeye.me",
   "http://localhost:3000", // for local testing
+  "http://localhost:5173", // for Vite dev server
+  "file://", // for local file testing
 ];
 
 app.use(
@@ -41,6 +48,19 @@ app.use(
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
+
+// ---- Health Check ----
+app.get("/", (req, res) => {
+  res.json({
+    status: "✅ RescueEye Server is running!",
+    timestamp: new Date().toISOString(),
+    endpoints: ["/chatbot", "/weather", "/disaster", "/alerts"],
+  });
+});
+
+app.get("/health", (req, res) => {
+  res.json({ status: "healthy", timestamp: new Date().toISOString() });
+});
 
 // ---- File Setup ----
 const ALERTS_FILE = path.join(__dirname, "alerts.json");
@@ -308,21 +328,181 @@ app.post("/signup", (req, res) => {
 });
 
 // ---- Chatbot ----
-app.post("/chatbot", (req, res) => {
-  const { message, enhancedMode } = req.body;
-  let response = "I'm sorry, I didn't understand that.";
+app.post("/chatbot", async (req, res) => {
+  console.log("Chatbot endpoint called with:", req.body);
 
-  if (enhancedMode) {
-    response = generateCulturalResponse(message);
-  } else {
-    response = "This is a regular response to your message: " + message;
+  try {
+    const { message, enhancedMode, location, weatherData, disasterData } =
+      req.body;
+
+    console.log("📨 Processing message:", message);
+    console.log("📍 Location:", location);
+
+    // Try Google AI first, then fallback to smart responses
+    try {
+      // Get the Gemini model - using gemini-2.0-flash as requested
+      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+      console.log("✅ Attempting Google AI with gemini-2.0-flash...");
+
+      // Create enhanced context-aware prompt for RescueEye Global
+      let prompt = `You are the AI Weather Assistant for RescueEye Global, a professional disaster management and emergency response platform. Your role is to provide accurate weather information, disaster alerts, and safety guidance to help communities stay safe.
+
+PERSONALITY & TONE:
+- Professional yet friendly and approachable
+- Clear, concise, and actionable advice
+- Prioritize safety above all else
+- Use encouraging language while being serious about risks
+
+USER QUERY: "${message}"`;
+
+      // Add location context if available
+      if (location) {
+        prompt += `\nLOCATION: ${location}`;
+      }
+
+      // Add weather data if available
+      if (weatherData) {
+        prompt += `\nCURRENT WEATHER DATA:
+- Temperature: ${weatherData.temp}°C (feels like ${weatherData.feels_like}°C)
+- Conditions: ${weatherData.description}
+- Humidity: ${weatherData.humidity}%
+- Wind Speed: ${weatherData.wind_speed} m/s`;
+      }
+
+      // Add disaster data if available
+      if (disasterData && disasterData.length > 0) {
+        prompt += `\nACTIVE DISASTER ALERTS:
+${disasterData.map((d) => `- ${d.event || d.type || "Alert"}`).join("\n")}`;
+      }
+
+      prompt += `\n\nINSTRUCTIONS:
+1. Provide a natural, conversational response about the weather conditions
+2. If there are any weather risks or concerns, include specific safety advice
+3. For severe weather or disasters, prioritize emergency safety instructions
+4. Include practical tips relevant to the current conditions
+5. Keep responses informative but concise (2-4 sentences)
+6. End with "Stay safe!" if there are any weather risks
+
+RESPONSE FORMAT: Provide a natural, helpful response as RescueEye Global's weather assistant.`;
+
+      // Generate response using Gemini
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
+
+      console.log("✅ Got Google AI response");
+      res.json({ response: text });
+    } catch (aiError) {
+      console.log("⚠️ Google AI failed, using smart fallback...");
+
+      // Smart fallback response system
+      let response = generateSmartResponse(
+        message,
+        location,
+        weatherData,
+        disasterData
+      );
+
+      console.log(
+        "✅ Generated smart response:",
+        response.substring(0, 100) + "..."
+      );
+      res.json({ response });
+    }
+  } catch (error) {
+    console.error("❌ Chatbot Error:", error);
+    res.status(500).json({
+      response:
+        "I'm sorry, I'm having technical difficulties. Please try again in a moment.",
+      error: error.message,
+    });
   }
-
-  res.json({ response });
 });
 
-function generateCulturalResponse(contextMessage) {
-  return "Based on your preference for Italian cuisine and outdoor activities, here are culturally appropriate safety recommendations...";
+// Smart response generator (fallback when Google AI is not available)
+function generateSmartResponse(message, location, weatherData, disasterData) {
+  const lowerMessage = message.toLowerCase();
+
+  let response = `🤖 **RescueEye AI Assistant**\n\n`;
+
+  // Check if asking about specific location
+  if (location) {
+    response += `📍 **Location: ${location}**\n\n`;
+  }
+
+  // Add weather information if available
+  if (weatherData) {
+    response += `🌤️ **Current Weather:**\n`;
+    response += `• Temperature: ${weatherData.temp}°C (feels like ${weatherData.feels_like}°C)\n`;
+    response += `• Conditions: ${weatherData.description}\n`;
+    response += `• Humidity: ${weatherData.humidity}%\n`;
+    response += `• Wind: ${weatherData.wind_speed} m/s\n\n`;
+  }
+
+  // Add disaster alerts if available
+  if (disasterData && disasterData.length > 0) {
+    response += `⚠️ **Active Alerts:**\n`;
+    disasterData.forEach((disaster) => {
+      response += `• ${disaster.event || disaster.type || "Alert"}\n`;
+    });
+    response += `\n`;
+  }
+
+  // Generate contextual advice based on query type
+  if (lowerMessage.includes("flood") || lowerMessage.includes("flooding")) {
+    response += `🚨 **Flood Safety Advice:**\n`;
+    response += `• Move to higher ground immediately\n`;
+    response += `• Never drive through flood water ("Turn Around, Don't Drown")\n`;
+    response += `• Stay away from storm drains and fast-moving water\n`;
+    response += `• Monitor emergency radio for evacuation orders\n`;
+  } else if (lowerMessage.includes("earthquake")) {
+    response += `🚨 **Earthquake Safety:**\n`;
+    response += `• DROP, COVER, and HOLD ON during shaking\n`;
+    response += `• Stay away from windows and heavy objects\n`;
+    response += `• If outdoors, move away from buildings and power lines\n`;
+    response += `• Be prepared for aftershocks\n`;
+  } else if (
+    lowerMessage.includes("hurricane") ||
+    lowerMessage.includes("storm")
+  ) {
+    response += `🌪️ **Storm Safety:**\n`;
+    response += `• Secure outdoor items and board windows if needed\n`;
+    response += `• Stock up on water, food, and batteries\n`;
+    response += `• Stay indoors and away from windows during the storm\n`;
+    response += `• Follow evacuation orders from authorities\n`;
+  } else if (lowerMessage.includes("fire")) {
+    response += `🔥 **Fire Safety:**\n`;
+    response += `• Have an evacuation plan ready\n`;
+    response += `• Keep important documents in a go-bag\n`;
+    response += `• Monitor air quality and wear masks if needed\n`;
+    response += `• Follow evacuation orders immediately\n`;
+  } else if (
+    lowerMessage.includes("weather") ||
+    lowerMessage.includes("forecast")
+  ) {
+    if (!weatherData) {
+      response += `💡 **Weather Information:**\n`;
+      response += `I can provide current weather conditions when you specify a location. Try asking "What's the weather in [city name]?"\n\n`;
+    }
+    response += `🎯 **Weather Tips:**\n`;
+    response += `• Check local weather alerts regularly\n`;
+    response += `• Dress appropriately for current conditions\n`;
+    response += `• Plan outdoor activities based on forecasts\n`;
+  } else {
+    response += `💡 **How I Can Help:**\n`;
+    response += `• Weather conditions for any location\n`;
+    response += `• Disaster alerts and safety advice\n`;
+    response += `• Emergency preparedness information\n`;
+    response += `• Safety tips for various weather conditions\n\n`;
+    response += `📝 **Try asking:**\n`;
+    response += `• "What's the weather in [city]?"\n`;
+    response += `• "Is there flooding in [location]?"\n`;
+    response += `• "How to prepare for hurricanes?"\n`;
+  }
+
+  response += `\n🔧 *Powered by RescueEye Global's weather intelligence system*`;
+
+  return response;
 }
 
 // ---- Qloo Proxy ----

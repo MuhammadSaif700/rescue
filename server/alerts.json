@@ -702,5 +702,53 @@
     "peopleAffected": 0,
     "icon": "⚠️",
     "reporter": "anonymous"
+  },
+  {
+    "id": 1763490379221,
+    "type": "medical",
+    "text": "egt",
+    "location": "e",
+    "coordinates": [
+      51.4721678,
+      19.3460637
+    ],
+    "timestamp": "2025-11-18T18:26:19.221Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1763491301826,
+    "type": "medical",
+    "text": "futgck",
+    "location": "ucktg",
+    "coordinates": [
+      0,
+      0
+    ],
+    "timestamp": "2025-11-18T18:41:41.826Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1763491995701,
+    "type": "medical",
+    "text": "yrj",
+    "location": "jry",
+    "coordinates": [
+      35.8909,
+      47.1284
+    ],
+    "timestamp": "2025-11-18T18:53:15.701Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
   }
 ]

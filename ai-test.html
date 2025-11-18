@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RescueEye AI Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #f0f0f0;
+      }
+      .test-container {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      input,
+      button {
+        padding: 10px;
+        margin: 5px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
+      #testInput {
+        width: 300px;
+      }
+      button {
+        background: #4ecdc4;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #45b7aa;
+      }
+      #result {
+        margin-top: 20px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 5px;
+        border-left: 4px solid #4ecdc4;
+        white-space: pre-wrap;
+      }
+      .loading {
+        color: #666;
+        font-style: italic;
+      }
+      .error {
+        color: #e74c3c;
+        border-left-color: #e74c3c;
+      }
+      .success {
+        color: #27ae60;
+        border-left-color: #27ae60;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>🤖 RescueEye AI Test</h1>
+      <p>
+        Test the Google AI integration with your RescueEye weather assistant.
+      </p>
+
+      <div style="margin: 20px 0">
+        <input
+          type="text"
+          id="testInput"
+          placeholder="Ask about weather... (e.g., 'Weather in London')"
+          value="What's the weather like in New York?"
+        />
+        <button onclick="testAI()">Test AI Assistant</button>
+        <button onclick="testServerStatus()">Check Server Status</button>
+      </div>
+
+      <div id="result">
+        Click "Test AI Assistant" to check if the Google AI integration is
+        working.
+      </div>
+    </div>
+
+    <script>
+      async function testServerStatus() {
+        const resultDiv = document.getElementById("result");
+        resultDiv.className = "loading";
+        resultDiv.textContent = "Checking server status...";
+
+        try {
+          const response = await fetch("http://localhost:5001/", {
+            method: "GET",
+          });
+
+          if (response.ok) {
+            resultDiv.className = "success";
+            resultDiv.textContent = "✅ Server is running and accessible!";
+          } else {
+            resultDiv.className = "error";
+            resultDiv.textContent = `❌ Server responded with status: ${response.status}`;
+          }
+        } catch (error) {
+          resultDiv.className = "error";
+          resultDiv.textContent = `❌ Cannot connect to server: ${error.message}`;
+        }
+      }
+
+      async function testAI() {
+        const input = document.getElementById("testInput").value;
+        const resultDiv = document.getElementById("result");
+
+        if (!input.trim()) {
+          resultDiv.className = "error";
+          resultDiv.textContent = "Please enter a question!";
+          return;
+        }
+
+        resultDiv.className = "loading";
+        resultDiv.textContent =
+          "🤖 Testing AI integration...\nSending request to Google AI...";
+
+        try {
+          const response = await fetch("http://localhost:5001/chatbot", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              message: input,
+              location: "New York", // Sample location
+              weatherData: {
+                temp: 22,
+                feels_like: 25,
+                description: "partly cloudy",
+                humidity: 65,
+                wind_speed: 3.2,
+              },
+              disasterData: [],
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
+          }
+
+          const data = await response.json();
+
+          resultDiv.className = "success";
+          resultDiv.innerHTML = `
+<strong>✅ AI Integration Working!</strong>
+
+<strong>Your Question:</strong>
+${input}
+
+<strong>AI Response:</strong>
+${data.response}
+
+<strong>Test Status:</strong> Google AI is responding correctly! 🎉
+                `;
+        } catch (error) {
+          resultDiv.className = "error";
+          resultDiv.innerHTML = `
+<strong>❌ AI Integration Issue</strong>
+
+<strong>Error:</strong> ${error.message}
+
+<strong>Troubleshooting:</strong>
+1. Make sure the server is running on port 5001
+2. Check if the Google AI API key is valid
+3. Verify the Gemini model name is correct
+4. Check browser console for more details
+                `;
+          console.error("Detailed error:", error);
+        }
+      }
+
+      // Auto-test server status on load
+      window.addEventListener("load", testServerStatus);
+    </script>
+  </body>
+</html>

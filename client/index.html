@@ -885,10 +885,12 @@
               >
                 <!-- Emergency type buttons remain the same -->
                 <button class="emergency-type-btn" data-type="accident">
-                  <i class="fas fa-car-crash"></i> Accident
+                  <!-- <i class="fas fa-car-crash"></i> -->
+                  Accident
                 </button>
                 <button class="emergency-type-btn" data-type="fire">
-                  <i class="fas fa-fire"></i> Fire
+                  <!-- <i class="fas fa-fire"></i>  -->
+                  Fire
                 </button>
                 <!-- 
                 <button class="emergency-type-btn" data-type="flood">
@@ -896,10 +898,12 @@
                 </button>
                 -->
                 <button class="emergency-type-btn" data-type="medical">
-                  <i class="fas fa-ambulance"></i> Medical
+                  <!-- <i class="fas fa-ambulance"></i>  -->
+                  Medical
                 </button>
                 <button class="emergency-type-btn" data-type="other">
-                  <i class="fas fa-exclamation-triangle"></i> Other
+                  <!-- <i class="fas fa-exclamation-triangle"></i>  -->
+                  Other
                 </button>
               </div>
               <div class="input-container">
@@ -990,37 +994,37 @@
                   class="example-chip"
                   data-text="Car accident on Mall Road with 2 injured people"
                 >
-                  🚗 Car Accident
+                  Car Accident
                 </div>
                 <div
                   class="example-chip"
                   data-text="House fire in F-7 Islamabad, family trapped inside"
                 >
-                  🔥 House Fire
+                  House Fire
                 </div>
                 <div
                   class="example-chip"
                   data-text="Medical emergency - heart attack at Centaurus Mall"
                 >
-                  🚑 Medical Emergency
+                  Medical Emergency
                 </div>
                 <div
                   class="example-chip"
                   data-text="Flooding on I-8 roads, cars stuck"
                 >
-                  🌊 Road Flooding
+                  Road Flooding
                 </div>
                 <div
                   class="example-chip"
                   data-text="Gas leak in G-9 residential area"
                 >
-                  ⚠️ Gas Leak
+                  Gas Leak
                 </div>
                 <div
                   class="example-chip"
                   data-text="Building collapse in old city area"
                 >
-                  🏢 Building Collapse
+                  Building Collapse
                 </div>
               </div>
             </div>
@@ -1127,8 +1131,7 @@
     <!-- Scripts -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-      const API_BASE =
-        "https://rescueeye-backend-emb6hfaycsazamf7.centralindia-01.azurewebsites.net";
+      const API_BASE = "http://localhost:5001";
       class RescueEyeApp {
         constructor() {
           this.map = null;
@@ -1327,7 +1330,7 @@
 
                 if (!location) {
                   // No location found in query
-                  displayGeneralResponse(aiReplyDiv, userInput);
+                  await displayGeneralResponse(aiReplyDiv, userInput);
                   return;
                 }
 
@@ -1337,15 +1340,35 @@
                   fetchDisasterData(location),
                 ]);
 
-                // Generate comprehensive response
-                const response = generateAIResponse(
-                  userInput,
-                  location,
-                  weatherData,
-                  disasterData
-                );
+                // Transform weather data to expected format
+                let transformedWeatherData = null;
+                if (weatherData?.current?.main) {
+                  transformedWeatherData = {
+                    temp: weatherData.current.main.temp,
+                    feels_like: weatherData.current.main.feels_like,
+                    description:
+                      weatherData.current.weather[0]?.description || "N/A",
+                    humidity: weatherData.current.main.humidity,
+                    wind_speed: weatherData.current.wind?.speed || 0,
+                  };
+                }
 
-                // Update the display with the formatted response
+                // Call the AI API
+                const aiResponse = await fetch(`${API_BASE}/chatbot`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    message: userInput,
+                    location: location,
+                    weatherData: transformedWeatherData,
+                    disasterData: disasterData,
+                  }),
+                });
+
+                const aiData = await aiResponse.json();
+                const response = aiData.response;
+
+                // Update the display with the AI response
                 aiReplyDiv.innerHTML = `
       <div style="margin-bottom: 10px;">
         <span style="font-weight: bold; color: #4ecdc4;">You asked:</span>
@@ -2166,29 +2189,58 @@ Format your response to be concise but culturally sensitive.
       }
 
       // Display general response when no location is found
-      function displayGeneralResponse(aiReplyDiv, userInput) {
-        const generalResponses = [
-          "I'm your RescueEye AI Assistant. You can ask me about weather conditions and disaster situations in specific locations. For example, try asking 'Is there flooding in New York?' or 'Weather in Tokyo'.",
-          "Hello! I can provide information about current weather and disaster alerts for specific locations. Just mention a city or region in your question.",
-        ];
-        aiReplyDiv.innerHTML = `
-          <div style="margin-bottom: 10px;">
-            <span style="font-weight: bold; color: #4ecdc4;">You asked:</span>
-            <div style="padding: 8px; background: rgba(255,255,255,0.05); border-radius: 8px; margin-top: 4px;">
-              ${userInput}
+      async function displayGeneralResponse(aiReplyDiv, userInput) {
+        try {
+          // Call Google AI API for general questions too
+          const aiResponse = await fetch(`${API_BASE}/chatbot`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              message: userInput,
+              location: null,
+              weatherData: null,
+              disasterData: null,
+            }),
+          });
+
+          const aiData = await aiResponse.json();
+          const response = aiData.response;
+
+          aiReplyDiv.innerHTML = `
+            <div style="margin-bottom: 10px;">
+              <span style="font-weight: bold; color: #4ecdc4;">You asked:</span>
+              <div style="padding: 8px; background: rgba(255,255,255,0.05); border-radius: 8px; margin-top: 4px;">
+                ${userInput}
+              </div>
             </div>
-          </div>
-          <div style="margin-top: 10px;">
-            <span style="font-weight: bold; color: #4ecdc4;">AI Response:</span>
-            <div style="padding: 8px; background: rgba(255,255,255,0.05); border-radius: 8px; margin-top: 4px; white-space: pre-line;">
-              ${
-                generalResponses[
-                  Math.floor(Math.random() * generalResponses.length)
-                ]
-              }
+            <div style="margin-top: 10px;">
+              <span style="font-weight: bold; color: #4ecdc4;">AI Response:</span>
+              <div style="padding: 8px; background: rgba(255,255,255,0.05); border-radius: 8px; margin-top: 4px; white-space: pre-line;">
+                ${response.replace(
+                  /\*\*(.*?)\*\*/g,
+                  '<strong style="color: #4ecdc4;">$1</strong>'
+                )}
+              </div>
             </div>
-          </div>
-        `;
+          `;
+        } catch (error) {
+          console.error("Error calling AI API:", error);
+          // Fallback to static response if API fails
+          aiReplyDiv.innerHTML = `
+            <div style="margin-bottom: 10px;">
+              <span style="font-weight: bold; color: #4ecdc4;">You asked:</span>
+              <div style="padding: 8px; background: rgba(255,255,255,0.05); border-radius: 8px; margin-top: 4px;">
+                ${userInput}
+              </div>
+            </div>
+            <div style="margin-top: 10px;">
+              <span style="font-weight: bold; color: #4ecdc4;">AI Response:</span>
+              <div style="padding: 8px; background: rgba(255,255,255,0.05); border-radius: 8px; margin-top: 4px; white-space: pre-line;">
+                I'm your RescueEye AI Assistant. You can ask me about weather conditions and disaster situations in specific locations. For example, try asking 'Is there flooding in New York?' or 'Weather in Tokyo'.
+              </div>
+            </div>
+          `;
+        }
       }
 
       // Generate safety advice based on disaster type
@@ -2317,7 +2369,7 @@ Format your response to be concise but culturally sensitive.
           }
 
           // Add weather advice based on conditions
-          response += `\n🧠 **Weather Insights**\n`;
+          response += `\n **Weather Insights**\n`;
           response += getWeatherAdvice(current, query) + "\n";
         } else {
           response += `I couldn't find weather information for "${location}".\n\n`;
