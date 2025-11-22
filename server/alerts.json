@@ -750,5 +750,21 @@
     "peopleAffected": 0,
     "icon": "🚑",
     "reporter": "anonymous"
+  },
+  {
+    "id": 1763807077215,
+    "type": "other",
+    "text": "it7utui",
+    "location": "toig",
+    "coordinates": [
+      46.0234741,
+      110.6520223
+    ],
+    "timestamp": "2025-11-22T10:24:37.215Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "⚠️",
+    "reporter": "anonymous"
   }
 ]
