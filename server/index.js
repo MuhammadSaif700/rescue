@@ -12,7 +12,7 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 
 // Initialize Google AI with your API key
-const GOOGLE_AI_API_KEY = "AIzaSyDnT3q5dy1LtB6oRIift5aMPdUqGEsRNRI";
+const GOOGLE_AI_API_KEY = process.env.GOOGLE_AI_API_KEY;
 const genAI = new GoogleGenerativeAI(GOOGLE_AI_API_KEY);
 
 // Use correct API base (localhost for dev, Railway URL for production)
@@ -340,9 +340,9 @@ app.post("/chatbot", async (req, res) => {
 
     // Try Google AI first, then fallback to smart responses
     try {
-      // Get the Gemini model - using gemini-2.0-flash as requested
-      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-      console.log("✅ Attempting Google AI with gemini-2.0-flash...");
+      // Get the Gemini model - using gemini-2.5-flash as requested
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+      console.log("✅ Attempting Google AI with gemini-2.5-flash...");
 
       // Create enhanced context-aware prompt for RescueEye Global
       let prompt = `You are the AI Weather Assistant for RescueEye Global, a professional disaster management and emergency response platform. Your role is to provide accurate weather information, disaster alerts, and safety guidance to help communities stay safe.

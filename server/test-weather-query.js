@@ -1,14 +1,15 @@
 // Direct test of gemini-2.0-flash model
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-const GOOGLE_AI_API_KEY = "AIzaSyDnT3q5dy1LtB6oRIift5aMPdUqGEsRNRI";
+require("dotenv").config();
+const GOOGLE_AI_API_KEY = process.env.GOOGLE_AI_API_KEY;
 const genAI = new GoogleGenerativeAI(GOOGLE_AI_API_KEY);
 
 async function testWeatherQuery() {
   try {
-    console.log("🧪 Testing gemini-2.0-flash with weather query...");
+    console.log("🧪 Testing gemini-2.5-flash with weather query...");
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const prompt = `You are RescueEye Global's weather assistant. You help people with weather information, disaster alerts, and safety advice.
 
@@ -22,7 +23,7 @@ Provide helpful, accurate weather information and safety advice. Keep responses 
     const response = await result.response;
     const text = response.text();
 
-    console.log("✅ SUCCESS! gemini-2.0-flash is working!");
+    console.log("✅ SUCCESS! gemini-2.5-flash is working!");
     console.log("📝 Response:");
     console.log("=" * 50);
     console.log(text);
