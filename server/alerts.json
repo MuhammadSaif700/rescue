@@ -766,5 +766,69 @@
     "peopleAffected": 0,
     "icon": "⚠️",
     "reporter": "anonymous"
+  },
+  {
+    "id": 1763808074178,
+    "type": "other",
+    "text": "jh",
+    "location": "jh",
+    "coordinates": [
+      23.4559809,
+      85.2557301
+    ],
+    "timestamp": "2025-11-22T10:41:14.178Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "⚠️",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1763818478465,
+    "type": "medical",
+    "text": "tyd",
+    "location": "tyd",
+    "coordinates": [
+      55.2843245,
+      124.7793223
+    ],
+    "timestamp": "2025-11-22T13:34:38.465Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1763819631775,
+    "type": "other",
+    "text": "gfs",
+    "location": "gef",
+    "coordinates": [
+      4.71601,
+      -74.0291092
+    ],
+    "timestamp": "2025-11-22T13:53:51.775Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "⚠️",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1763843186919,
+    "type": "other",
+    "text": "hfbc",
+    "location": "hmc",
+    "coordinates": [
+      35.6551111,
+      139.7570622
+    ],
+    "timestamp": "2025-11-22T20:26:26.920Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "⚠️",
+    "reporter": "anonymous"
   }
 ]

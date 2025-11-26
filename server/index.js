@@ -12,8 +12,19 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 
 // Initialize Google AI with your API key
-const GOOGLE_AI_API_KEY = "AIzaSyDnT3q5dy1LtB6oRIift5aMPdUqGEsRNRI";
+const GOOGLE_AI_API_KEY = "AIzaSyDqzaDPcwYZsdprVssybbGM59c5sTvTF6M";
 const genAI = new GoogleGenerativeAI(GOOGLE_AI_API_KEY);
+
+// AI Rate limiting and caching to work with free tier
+let lastAICallTime = 0;
+const AI_CALL_COOLDOWN = 3000; // 3 seconds between AI calls
+const aiResponseCache = new Map(); // Cache responses to reduce API calls
+const CACHE_DURATION = 60000; // Cache for 1 minute
+
+// Function to generate cache key
+function getCacheKey(message, location) {
+  return `${message.toLowerCase().trim()}_${location || 'unknown'}`;
+}
 
 // Use correct API base (localhost for dev, Railway URL for production)
 const API_BASE =
@@ -85,6 +96,46 @@ app.get("/weather", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Something went wrong" });
+  }
+});
+
+// ---- AI Health Check Endpoint ----
+app.get("/ai-status", async (req, res) => {
+  const timeSinceLastCall = Date.now() - lastAICallTime;
+  const canCallAI = timeSinceLastCall >= AI_CALL_COOLDOWN;
+  
+  try {
+    if (!canCallAI) {
+      return res.json({
+        status: "cooldown",
+        message: "AI is in cooldown period",
+        waitSeconds: Math.ceil((AI_CALL_COOLDOWN - timeSinceLastCall) / 1000),
+        cacheSize: aiResponseCache.size
+      });
+    }
+
+    // Try a quick AI call
+    lastAICallTime = Date.now();
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+    const result = await model.generateContent("Say OK");
+    const response = await result.response;
+    const text = response.text();
+    
+    res.json({
+      status: "working",
+      message: "Google AI is operational",
+      model: "gemini-2.0-flash-exp",
+      testResponse: text,
+      cacheSize: aiResponseCache.size
+    });
+  } catch (error) {
+    res.json({
+      status: "error",
+      message: error.message.includes("429") ? "Rate limited" : "AI unavailable",
+      error: error.message.substring(0, 200),
+      fallback: "Using smart response system",
+      cacheSize: aiResponseCache.size
+    });
   }
 });
 
@@ -338,11 +389,30 @@ app.post("/chatbot", async (req, res) => {
     console.log("📨 Processing message:", message);
     console.log("📍 Location:", location);
 
+    // Check cache first
+    const cacheKey = getCacheKey(message, location);
+    const cachedResponse = aiResponseCache.get(cacheKey);
+    if (cachedResponse && Date.now() - cachedResponse.timestamp < CACHE_DURATION) {
+      console.log("💾 Using cached response");
+      return res.json({ response: cachedResponse.text, cached: true });
+    }
+
+    // Check rate limiting - force cooldown between AI calls
+    const timeSinceLastCall = Date.now() - lastAICallTime;
+    if (timeSinceLastCall < AI_CALL_COOLDOWN) {
+      console.log(`⏳ Rate limiting: Wait ${Math.ceil((AI_CALL_COOLDOWN - timeSinceLastCall) / 1000)}s`);
+      // Use fallback during cooldown
+      const response = generateSmartResponse(message, location, weatherData, disasterData);
+      return res.json({ response, fallback: "rate-limit" });
+    }
+
     // Try Google AI first, then fallback to smart responses
     try {
-      // Get the Gemini model - using gemini-2.0-flash as requested
-      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-      console.log("✅ Attempting Google AI with gemini-2.0-flash...");
+      lastAICallTime = Date.now(); // Update last call time
+      
+      // Get the Gemini model - using gemini-2.0-flash-exp (experimental but available)
+      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+      console.log("✅ Attempting Google AI with gemini-2.0-flash-exp...");
 
       // Create enhanced context-aware prompt for RescueEye Global
       let prompt = `You are the AI Weather Assistant for RescueEye Global, a professional disaster management and emergency response platform. Your role is to provide accurate weather information, disaster alerts, and safety guidance to help communities stay safe.
@@ -390,10 +460,22 @@ RESPONSE FORMAT: Provide a natural, helpful response as RescueEye Global's weath
       const response = await result.response;
       const text = response.text();
 
-      console.log("✅ Got Google AI response");
-      res.json({ response: text });
+      // Cache the successful response
+      aiResponseCache.set(cacheKey, {
+        text: text,
+        timestamp: Date.now()
+      });
+
+      console.log("✅ Got Google AI response - cached for future use");
+      res.json({ response: text, ai: true });
     } catch (aiError) {
-      console.log("⚠️ Google AI failed, using smart fallback...");
+      console.log("⚠️ Google AI failed:", aiError.message.substring(0, 100));
+      
+      // If it's a rate limit error, wait longer next time
+      if (aiError.message.includes("429") || aiError.message.includes("quota")) {
+        console.log("💤 Rate limit detected - extending cooldown");
+        lastAICallTime = Date.now() + 10000; // Add 10 extra seconds
+      }
 
       // Smart fallback response system
       let response = generateSmartResponse(
@@ -407,7 +489,7 @@ RESPONSE FORMAT: Provide a natural, helpful response as RescueEye Global's weath
         "✅ Generated smart response:",
         response.substring(0, 100) + "..."
       );
-      res.json({ response });
+      res.json({ response, fallback: "ai-error" });
     }
   } catch (error) {
     console.error("❌ Chatbot Error:", error);

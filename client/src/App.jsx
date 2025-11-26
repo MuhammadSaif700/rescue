@@ -170,7 +170,7 @@ function App() {
       {/* --- END: ADD THIS NEW CHATBOX --- */}
 
       <div className="alert-history" style={{ marginTop: "40px", textAlign: "left" }}>
-        <h2>📜 Alert History</h2>
+        <h2> Alert History</h2>
         {alerts.length === 0 ? (
           <p>No alerts recorded yet.</p>
         ) : (

@@ -1,88 +1,52 @@
-**RescueEye Global**
+Rescueeye Global is a platform in which people can report emergency online.It allows user to report any type of emergency and select the location of emergnecy to make a report online.
+It also offers the sataus checker section for users ,it helps user to check the sataus of thier specific location wheather there is a danger or emergency.Another sightful thing is the Ai assistant it helps users to get the recommendation to be safe from any emergency.
 
-A community-oriented platform that simplifies the process of reporting emergencies and provides real-time updates on disaster and weather conditions.
+## Features
 
-### 🌍 About the Project
+- Report emergenicies online.
+- Check the staus of location
+- Get recommendations through Ai assistant
 
-RescueEye Global is created to help people easily report emergencies and stay informed during critical times. When crises occur, it can be difficult to find accurate information or share what’s happening in your area. This project is all about making that process smoother and more reliable.
+## Tech stack
 
-### ✅ What you can do with it
+- HTML
+- CSS
+- JS
+- Node
+- React
 
-- 🗺️ **Report emergencies**: Quickly and easily report incidents using an interactive map, ensuring that vital information gets where it needs to go.
-- 🌦️ **Check weather and disaster alerts**: Stay updated on the latest weather conditions and disaster warnings for any location, helping you make informed decisions.
-- 🤖 **Chat with an AI assistant**: Use the AI chatbot to ask questions about weather conditions and safety tips, making it easier to find the answers you need.
-- 📌 **Get preparedness tips**: Access helpful advice on how to prepare for different types of emergencies, so you and your loved ones know how to stay safe.
+## APIs
 
-### 🚀 Getting it running locally
+- Openweathermap
+- GDACS
+- USGS
+- ReliefWeb
 
-To set up RescueEye Global on your computer, you'll need Node.js and Python installed.
+## How to run it
 
-1. **Backend (Node.js)**:
+You need Node.js and Python installed.
 
-   ```bash
-   cd server
-   node index.js
-   ```
+**Backend server:**
 
-2. **Frontend (React)**:
-
-   ```bash
-   cd client
-   npm install
-   npm start
-   ```
-
-3. **(Optional) AI Chatbot**:
-   ```bash
-   cd chat
-   python weatherbot_client.py
-   ```
-
-Once everything is set up, open your web browser and go to:  
-👉 [http://localhost:3000](http://localhost:3000)
-
-### 🛠 Tech Stack
+```bash
+cd server
+node index.js
+```
 
 **Frontend:**
 
-- **React.js**: A popular library for building user interfaces.
-- **Leaflet.js**: A powerful tool for creating interactive maps.
-- **HTML/CSS/JavaScript**: The core technologies for web development.
-
-**Backend:**
-
-- **Node.js + Express**: A robust framework for building server-side applications.
-- **JSON**: Used for data storage.
-
-**APIs used:**
-
-- **OpenWeatherMap**: For accurate weather information.
-- **GDACS / USGS / ReliefWeb**: Sources for real-time disaster alerts.
-
-### 📁 Project Structure
-
-```
-├── client/    # React frontend
-├── server/    # Express backend
-├── chat/      # Python chatbot
-└── README.md
+```bash
+cd client
+npm install
+npm start
 ```
 
-### ✅ What’s already working
-
-- **Emergency reports**: Users can mark incidents on an interactive map for better visibility.
-- **Weather lookups**: Easily check weather details for any location.
-- **AI chatbot**: Get answers to weather questions and safety tips.
-- **Preparedness information**: Access essential tips for staying safe during emergencies.
-
-### 🎥 Demo
+## Demo
 
 [![Watch the video](demo-thumbnail.png)](https://github.com/user-attachments/assets/77bab367-0c9f-4b75-a96d-f6a9bb7b7d37)
 
-### 🤝 Contributing
+## Contributing
 
-If you have ideas or suggestions for improvements, we'd love to hear them! Feel free to fork the repository, submit a pull request, or report any issues you encounter.
+Feel free to contribute
 
-### 📄 License
-
-This project is under the MIT License — feel free to use, modify, and share it as you like.
+### Report emergencies online

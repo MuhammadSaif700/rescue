@@ -1,7 +1,7 @@
 // List available Google AI models
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-const GOOGLE_AI_API_KEY = "AIzaSyDnT3q5dy1LtB6oRIift5aMPdUqGEsRNRI";
+const GOOGLE_AI_API_KEY = "AIzaSyDqzaDPcwYZsdprVssybbGM59c5sTvTF6M";
 const genAI = new GoogleGenerativeAI(GOOGLE_AI_API_KEY);
 
 async function listModels() {

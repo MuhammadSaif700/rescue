@@ -1,14 +1,14 @@
 // Test the enhanced Gemini prompt
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-const GOOGLE_AI_API_KEY = "AIzaSyDnT3q5dy1LtB6oRIift5aMPdUqGEsRNRI";
+const GOOGLE_AI_API_KEY = "AIzaSyDqzaDPcwYZsdprVssybbGM59c5sTvTF6M";
 const genAI = new GoogleGenerativeAI(GOOGLE_AI_API_KEY);
 
 async function testEnhancedPrompt() {
   try {
     console.log("🧪 Testing Enhanced RescueEye Gemini Prompt...\n");
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
 
     // Test different scenarios
     const testCases = [
