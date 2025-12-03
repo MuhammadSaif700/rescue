@@ -1,9 +1,0 @@
-@echo off
-echo Waiting for Google AI rate limit to reset...
-echo Please wait 90 seconds...
-timeout /t 90 /nobreak
-echo.
-echo Testing Google AI now...
-cd server
-node find-working-model.js
-pause
