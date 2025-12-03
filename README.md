@@ -1,6 +1,6 @@
 # RescueEye Global
 
-## Overview
+# Overview
 
 Rescueeye Global is a platform in which people can report emergency online.It allows user to report any type of emergency and select the location of emergnecy to make a report online.
 It also offers the sataus checker section for users ,it helps user to check the sataus of thier specific location wheather there is a danger or emergency.Another sightful thing is the Ai assistant it helps users to get the recommendation to be safe from any emergency.
@@ -9,7 +9,7 @@ It also offers the sataus checker section for users ,it helps user to check the 
 
 ## Features
 
----- Report emergenicies online.
+Report emergenicies online.
 
 - Check the staus of location
 - Get recommendations through Ai assistant
@@ -40,7 +40,7 @@ npm run dev
 
 ---
 
-## Tech stack
+# Tech stack
 
 - HTML
 - CSS
@@ -50,7 +50,7 @@ npm run dev
 
 ---
 
-## APIs
+# APIs
 
 - Openweathermap
 - GDACS
@@ -63,11 +63,13 @@ npm run dev
 
 ---
 
-## 🤝 Contributing
+# 🤝 Contributing
 
-## Feel free to contribute
+Feel free to contribute
 
-## 📝 License
+---
+
+# 📝 License
 
 This project is licensed under the MIT License.
 
