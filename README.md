@@ -14,7 +14,7 @@ Report emergenicies online.
 - Check the staus of location
 - Get recommendations through Ai assistant
 
-## 🏁 Getting Started
+## Getting Started
 
 ### Prerequisites
 
