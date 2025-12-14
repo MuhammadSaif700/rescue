@@ -22,19 +22,52 @@ Report emergenicies online.
 
 ### Installation & Startup
 
+#### Quick Start (Recommended)
+
+**Option 1: Use the startup script**
+
+```sh
+# Just double-click this file:
+START-EVERYTHING.bat
+```
+
+This will automatically:
+
+- Start the backend server on port 5001
+- Open the app in your browser
+- Keep the server running
+
+#### Manual Start
+
+**Option 2: Start manually**
+
 1. **Start the backend server:**
 
 ```sh
-cd D:\Downloads\rescueeye-global\server
+cd server
 node index.js
 ```
 
-2. **Start the React client:**
+Wait for: `🚀 Server running on port 5001`
+
+2. **Open the app:**
 
 ```sh
-cd D:\Downloads\rescueeye-global\client
-npm run dev
+# Double-click this file:
+client\index.html
+
+# Or open in browser:
+# http://localhost:5001 (if using a local web server)
+# Or directly: file:///D:/Downloads/rescueeye-global/client/index.html
 ```
+
+**⚠️ Important:** Keep the server terminal window open while using the app!
+
+#### What Each Section Does
+
+- **Report Emergency** - Report disasters with location and type
+- **Location Status** - Check safety status of any location
+- **AI Assistance** - Ask weather and disaster questions (powered by Perplexity AI)
 
 ---
 

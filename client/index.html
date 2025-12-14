@@ -1127,8 +1127,7 @@
     <!-- Scripts -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-      const API_BASE =
-        "https://rescueeye-backend-emb6hfaycsazamf7.centralindia-01.azurewebsites.net";
+      const API_BASE = "http://localhost:5001";
       class RescueEyeApp {
         constructor() {
           this.map = null;
@@ -1294,7 +1293,7 @@
               }
             });
 
-          // AI Submit button - Replace your existing AI submit handler
+          // AI Submit button - Using Perplexity AI
           document
             .getElementById("aiSubmit")
             .addEventListener("click", async () => {
@@ -1314,7 +1313,7 @@
     <div style="margin-top: 10px;">
       <span style="font-weight: bold; color: #4ecdc4;">AI Response:</span>
       <div style="padding: 8px; background: rgba(255,255,255,0.05); border-radius: 8px; margin-top: 4px; white-space: pre-line;">
-        <i class="fas fa-spinner fa-spin"></i> Analyzing weather and disaster data...
+        <i class="fas fa-spinner fa-spin"></i> Analyzing with AI...
       </div>
     </div>
   `;
@@ -1322,30 +1321,25 @@
               document.getElementById("aiInput").value = "";
 
               try {
-                // Extract location from user input using a more robust approach
-                const location = extractLocationFromQuery(userInput);
+                // Call Perplexity AI via our backend
+                const response = await fetch(`${API_BASE}/chatbot`, {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    message: userInput,
+                  }),
+                });
 
-                if (!location) {
-                  // No location found in query
-                  displayGeneralResponse(aiReplyDiv, userInput);
-                  return;
+                if (!response.ok) {
+                  throw new Error(`API request failed: ${response.statusText}`);
                 }
 
-                // Get both weather and disaster data in parallel
-                const [weatherData, disasterData] = await Promise.all([
-                  fetchWeatherData(location),
-                  fetchDisasterData(location),
-                ]);
+                const data = await response.json();
+                const aiResponse = data.response;
 
-                // Generate comprehensive response
-                const response = generateAIResponse(
-                  userInput,
-                  location,
-                  weatherData,
-                  disasterData
-                );
-
-                // Update the display with the formatted response
+                // Update the display with the AI response
                 aiReplyDiv.innerHTML = `
       <div style="margin-bottom: 10px;">
         <span style="font-weight: bold; color: #4ecdc4;">You asked:</span>
@@ -1355,8 +1349,8 @@
       </div>
       <div style="margin-top: 10px;">
         <span style="font-weight: bold; color: #4ecdc4;">AI Response:</span>
-        <div style="padding: 8px; background: rgba(255,255,255,0.05); border-radius: 8px; margin-top: 4px; white-space: pre-line;">
-          ${response.replace(
+        <div style="padding: 8px; background: rgba(255,255,255,0.05); border-radius: 8px; margin-top: 4px; white-space: pre-line; line-height: 1.6;">
+          ${aiResponse.replace(
             /\*\*(.*?)\*\*/g,
             '<strong style="color: #4ecdc4;">$1</strong>'
           )}
@@ -1375,7 +1369,7 @@
       <div style="margin-top: 10px;">
         <span style="font-weight: bold; color: #4ecdc4;">AI Response:</span>
         <div style="padding: 8px; background: rgba(255,255,255,0.05); border-radius: 8px; margin-top: 4px; color: #ff6b6b;">
-          <i class="fas fa-exclamation-triangle"></i> I encountered an error while processing your weather request. Please try again or ask about a different location.
+          <i class="fas fa-exclamation-triangle"></i> I encountered an error connecting to Perplexity AI. Please check if the server is running and try again.
         </div>
       </div>
     `;
@@ -2098,374 +2092,7 @@ Format your response to be concise but culturally sensitive.
         };
       }
 
-      // Extract location from user query
-      function extractLocationFromQuery(query) {
-        // Check for direct location questions
-        const locationPatterns = [
-          /(?:in|at|for|about|around|near)\s+([A-Za-z\s,]+)(?:\?|$)/i,
-          /(?:weather|conditions|disasters?|flood(?:s|ing)?|earthquake(?:s)?|fire(?:s)?|hurricane(?:s)?|storm(?:s)?|tsunami(?:s)?|tornado(?:es)?)\s+(?:in|at|for|of|near)\s+([A-Za-z\s,]+)(?:\?|$)/i,
-          /(?:is\s+there(?:\s+a)?\s+(?:disaster|flood(?:ing)?|earthquake|fire|hurricane|storm|tsunami|tornado))\s+in\s+([A-Za-z\s,]+)(?:\?|$)/i,
-          /([A-Za-z\s,]+?)(?:\s+weather|disaster|flood|earthquake|fire)(?:\?|$)/i,
-        ];
-
-        for (const pattern of locationPatterns) {
-          const match = query.match(pattern);
-          if (match && match[1]) {
-            return match[1].trim();
-          }
-        }
-
-        // Check if query is just a location name
-        if (/^[A-Za-z\s,]+$/.test(query)) {
-          return query.trim();
-        }
-
-        return null;
-      }
-
-      // Fetch weather data for a location
-      async function fetchWeatherData(location) {
-        try {
-          // Get current weather
-          const weatherRes = await fetch(
-            `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(
-              location
-            )}&appid=21af7453a5b5eea1f18565bb32fb31af&units=metric`
-          );
-          const currentWeather = await weatherRes.json();
-
-          // Get weather forecast (next 5 days)
-          const forecastRes = await fetch(
-            `https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(
-              location
-            )}&appid=21af7453a5b5eea1f18565bb32fb31af&units=metric&cnt=8`
-          );
-          const forecast = await forecastRes.json();
-
-          return {
-            current: currentWeather,
-            forecast: forecast,
-          };
-        } catch (e) {
-          console.error("Weather API error:", e);
-          return null;
-        }
-      }
-
-      // Fetch disaster data for a location
-      async function fetchDisasterData(location) {
-        try {
-          const res = await fetch(
-            `${API_BASE}/disaster?location=${encodeURIComponent(location)}`
-          );
-          return await res.json();
-        } catch (e) {
-          console.error("Disaster API error:", e);
-          return { status: "Error fetching disaster data." };
-        }
-      }
-
-      // Display general response when no location is found
-      function displayGeneralResponse(aiReplyDiv, userInput) {
-        const generalResponses = [
-          "I'm your RescueEye AI Assistant. You can ask me about weather conditions and disaster situations in specific locations. For example, try asking 'Is there flooding in New York?' or 'Weather in Tokyo'.",
-          "Hello! I can provide information about current weather and disaster alerts for specific locations. Just mention a city or region in your question.",
-        ];
-        aiReplyDiv.innerHTML = `
-          <div style="margin-bottom: 10px;">
-            <span style="font-weight: bold; color: #4ecdc4;">You asked:</span>
-            <div style="padding: 8px; background: rgba(255,255,255,0.05); border-radius: 8px; margin-top: 4px;">
-              ${userInput}
-            </div>
-          </div>
-          <div style="margin-top: 10px;">
-            <span style="font-weight: bold; color: #4ecdc4;">AI Response:</span>
-            <div style="padding: 8px; background: rgba(255,255,255,0.05); border-radius: 8px; margin-top: 4px; white-space: pre-line;">
-              ${
-                generalResponses[
-                  Math.floor(Math.random() * generalResponses.length)
-                ]
-              }
-            </div>
-          </div>
-        `;
-      }
-
-      // Generate safety advice based on disaster type
-      function getSafetyAdvice(disasterType) {
-        const adviceMap = {
-          flood: `
-🚨 FLOOD SAFETY ADVICE:
-• Move to higher ground immediately
-• Do NOT walk, swim, or drive through flood waters
-• Stay off bridges over fast-moving water
-• Evacuate if told to do so by authorities
-• Monitor emergency radio and alerts
-• Prepare for evacuation (take only essentials)
-• Avoid contact with flood water (may be contaminated)`,
-
-          earthquake: `
-🚨 EARTHQUAKE SAFETY ADVICE:
-• DROP to the ground
-• COVER by getting under a sturdy table
-• HOLD ON until shaking stops
-• Stay away from windows and exterior walls
-• If outdoors, move to a clear area away from buildings
-• If in a vehicle, pull over away from buildings and power lines
-• Be prepared for aftershocks
-• Check for injuries and damage after shaking stops`,
-
-          fire: `
-🚨 FIRE SAFETY ADVICE:
-• Evacuate immediately if authorities advise
-• Close all doors behind you when evacuating
-• If caught in smoke, get low and crawl under the smoke
-• Feel doors before opening - if hot, find another escape route
-• Designate a meeting place outside
-• Call emergency services once safely outside
-• Never go back inside a burning building
-• If trapped, cover vents and call for help`,
-
-          hurricane: `
-🚨 HURRICANE SAFETY ADVICE:
-• Evacuate if directed by authorities
-• Stay informed via emergency broadcasts
-• Secure your home - board windows and secure outdoor objects
-• Have emergency supplies ready
-• Fill bathtubs and containers with water
-• Stay away from windows during the storm
-• Be aware of flooding and storm surges
-• Do not walk, swim or drive through flood waters`,
-
-          tornado: `
-🚨 TORNADO SAFETY ADVICE:
-• Seek shelter immediately in a basement or interior room
-• Stay away from windows and doors
-• Cover yourself with a heavy blanket or mattress
-• Keep your phone charged and have backup power sources
-• Document any property damage with photos`,
-        };
-      }
-
-      // Replace the current generateAIResponse function with this enhanced version
-      function generateAIResponse(query, location, weatherData, disasterData) {
-        let response = "";
-
-        // Enhanced weather information
-        if (weatherData && weatherData.current && weatherData.current.main) {
-          const current = weatherData.current;
-          const forecast = weatherData.forecast;
-
-          response += `📍 ${current.name}, ${current.sys.country}\n\n`;
-
-          // Current weather details - expanded
-          response += `🌡️ **Current Weather**\n`;
-          response += `• Temperature: ${current.main.temp}°C (feels like ${current.main.feels_like}°C)\n`;
-          response += `• Conditions: ${current.weather[0].description}\n`;
-          response += `• Humidity: ${current.main.humidity}%\n`;
-          response += `• Wind: ${current.wind.speed} m/s`;
-          if (current.wind.deg) {
-            response += ` from ${getWindDirection(current.wind.deg)}\n`;
-          } else {
-            response += `\n`;
-          }
-
-          // Add pressure, visibility, cloudiness
-          response += `• Pressure: ${current.main.pressure} hPa\n`;
-          response += `• Visibility: ${(current.visibility / 1000).toFixed(
-            1
-          )} km\n`;
-          response += `• Cloudiness: ${current.clouds.all}%\n`;
-
-          // Add sunrise and sunset times
-          if (current.sys && current.sys.sunrise && current.sys.sunset) {
-            const sunriseTime = new Date(
-              current.sys.sunrise * 1000
-            ).toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            });
-            const sunsetTime = new Date(
-              current.sys.sunset * 1000
-            ).toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            });
-            response += `• Sunrise: ${sunriseTime}\n`;
-            response += `• Sunset: ${sunsetTime}\n`;
-          }
-
-          // Add forecast information
-          if (forecast && forecast.list && forecast.list.length > 0) {
-            response += `\n🔮 **Weather Forecast**\n`;
-
-            // Show next 3 periods (usually 3-hour intervals)
-            for (let i = 0; i < Math.min(3, forecast.list.length); i++) {
-              const period = forecast.list[i];
-              const time = new Date(period.dt * 1000).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              });
-              const date = new Date(period.dt * 1000).toLocaleDateString([], {
-                weekday: "short",
-                month: "short",
-                day: "numeric",
-              });
-
-              response += `• ${date} at ${time}: ${period.main.temp}°C, ${period.weather[0].description}\n`;
-            }
-          }
-
-          // Add weather advice based on conditions
-          response += `\n **Weather Insights**\n`;
-          response += getWeatherAdvice(current, query) + "\n";
-        } else {
-          response += `I couldn't find weather information for "${location}".\n\n`;
-        }
-
-        // Disaster information (keep your existing code)
-        const hasDisaster =
-          disasterData &&
-          disasterData.status &&
-          disasterData.status !== "No disaster reported. Area is normal.";
-
-        if (hasDisaster) {
-          response += `\n⚠️ **ALERT**: ${disasterData.status}\n\n`;
-
-          // Determine disaster type for safety advice
-          let disasterType = "general";
-          const disasterStatus = disasterData.status.toLowerCase();
-
-          if (disasterStatus.includes("flood")) disasterType = "flood";
-          else if (disasterStatus.includes("earthquake"))
-            disasterType = "earthquake";
-          else if (disasterStatus.includes("fire")) disasterType = "fire";
-          else if (
-            disasterStatus.includes("hurricane") ||
-            disasterStatus.includes("cyclone")
-          )
-            disasterType = "hurricane";
-          else if (disasterStatus.includes("tornado")) disasterType = "tornado";
-          else if (disasterStatus.includes("tsunami")) disasterType = "tsunami";
-
-          response += getSafetyAdvice(disasterType);
-
-          // Add emergency contact reminder
-          response += `\n\nPlease contact local emergency services if you're in danger.`;
-        } else if (disasterData && disasterData.status) {
-          response += `\n✅ **SAFETY STATUS**: No disasters currently reported in ${location}.\n`;
-          response += `The area appears to be safe based on current data. However, always stay informed about changing conditions.\n`;
-        } else {
-          response += `\nI couldn't retrieve disaster information for ${location} at this time.\n`;
-          response += `Please check official local sources for the most current emergency information.`;
-        }
-
-        return response;
-      }
-
-      // Add these new helper functions
-      function getWindDirection(degrees) {
-        const directions = [
-          "North",
-          "Northeast",
-          "East",
-          "Southeast",
-          "South",
-          "Southwest",
-          "West",
-          "Northwest",
-        ];
-        return directions[Math.round(degrees / 45) % 8];
-      }
-
-      function getWeatherAdvice(weatherData, query) {
-        let advice = "";
-        const temp = weatherData.main.temp;
-        const conditions = weatherData.weather[0].main.toLowerCase();
-        const windSpeed = weatherData.wind.speed;
-
-        // Temperature advice
-        if (temp > 32) {
-          advice +=
-            "• Extreme heat - stay hydrated, limit outdoor activities, seek air-conditioned spaces\n";
-        } else if (temp > 27) {
-          advice +=
-            "• Hot conditions - wear light clothing, use sunscreen, drink plenty of water\n";
-        } else if (temp > 20) {
-          advice += "• Warm and pleasant - good for outdoor activities\n";
-        } else if (temp > 10) {
-          advice +=
-            "• Mild temperatures - consider a light jacket or sweater\n";
-        } else if (temp > 0) {
-          advice += "• Cool weather - wear layers and a jacket\n";
-        } else if (temp > -10) {
-          advice +=
-            "• Cold conditions - dress warmly with proper winter clothing\n";
-        } else {
-          advice +=
-            "• Extreme cold - limit time outdoors, wear appropriate winter gear\n";
-        }
-
-        // Weather condition advice
-        if (conditions.includes("rain") || conditions.includes("drizzle")) {
-          advice += "• Rainy conditions - bring an umbrella or raincoat\n";
-          if (conditions.includes("thunder")) {
-            advice +=
-              "• Thunderstorm alert - seek shelter indoors, avoid open spaces and tall objects\n";
-          }
-        } else if (conditions.includes("snow")) {
-          advice +=
-            "• Snowy conditions - allow extra travel time, wear appropriate footwear\n";
-        } else if (conditions.includes("fog")) {
-          advice +=
-            "• Foggy conditions - reduced visibility, drive with caution\n";
-        } else if (conditions.includes("clear")) {
-          if (temp > 25) {
-            advice += "• Sunny day - wear sunscreen and stay hydrated\n";
-          } else {
-            advice += "• Clear skies - excellent for outdoor activities\n";
-          }
-        } else if (conditions.includes("cloud")) {
-          advice += "• Cloudy conditions - consider bringing a light jacket\n";
-        }
-
-        // Wind advice
-        if (windSpeed > 15) {
-          advice +=
-            "• Strong winds - secure loose objects outdoors, be cautious with high-profile vehicles\n";
-        } else if (windSpeed > 8) {
-          advice +=
-            "• Moderately windy conditions - could affect outdoor activities\n";
-        }
-
-        // Travel advice based on query
-        if (
-          query.toLowerCase().includes("travel") ||
-          query.toLowerCase().includes("trip") ||
-          query.toLowerCase().includes("visit")
-        ) {
-          advice += "\n**Travel Recommendations**:\n";
-
-          if (conditions.includes("clear") && temp > 15 && temp < 30) {
-            advice += "• Excellent weather for tourism and sightseeing\n";
-          } else if (
-            (conditions.includes("rain") && weatherData.rain) ||
-            (conditions.includes("snow") && weatherData.snow)
-          ) {
-            advice += "• Consider indoor activities due to precipitation\n";
-          }
-
-          if (temp > 30) {
-            advice +=
-              "• Plan indoor activities during peak heat hours (10am-4pm)\n";
-          } else if (temp < 5) {
-            advice +=
-              "• Dress warmly and plan for shorter outdoor excursions\n";
-          }
-        }
-
-        return advice;
-      }
+      // All manual weather functions removed - now using Perplexity AI for intelligent responses!
     </script>
   </body>
 </html>

@@ -830,5 +830,517 @@
     "peopleAffected": 0,
     "icon": "⚠️",
     "reporter": "anonymous"
+  },
+  {
+    "id": 1765568008126,
+    "type": "fire",
+    "text": "bcn",
+    "location": "sydney",
+    "coordinates": [
+      -33.8698439,
+      151.2082848
+    ],
+    "timestamp": "2025-12-12T19:33:28.126Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🔥",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1765568018611,
+    "type": "medical",
+    "text": "ngn",
+    "location": "sydney",
+    "coordinates": [
+      -33.8698439,
+      151.2082848
+    ],
+    "timestamp": "2025-12-12T19:33:38.611Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1765568026339,
+    "type": "medical",
+    "text": "fg",
+    "location": "sydney",
+    "coordinates": [
+      -33.8698439,
+      151.2082848
+    ],
+    "timestamp": "2025-12-12T19:33:46.339Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1765568096102,
+    "type": "medical",
+    "text": "fever",
+    "location": "London",
+    "coordinates": [
+      51.5074456,
+      -0.1277653
+    ],
+    "timestamp": "2025-12-12T19:34:56.102Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1765568104985,
+    "type": "medical",
+    "text": "gcgnc",
+    "location": "sydney",
+    "coordinates": [
+      -33.8698439,
+      151.2082848
+    ],
+    "timestamp": "2025-12-12T19:35:04.985Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1765568272893,
+    "type": "medical",
+    "text": "bv",
+    "location": "sydney",
+    "coordinates": [
+      -33.8698439,
+      151.2082848
+    ],
+    "timestamp": "2025-12-12T19:37:52.893Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1765568286107,
+    "type": "medical",
+    "text": "hbn",
+    "location": "hj",
+    "coordinates": [
+      59.2238965,
+      6.2193438
+    ],
+    "timestamp": "2025-12-12T19:38:06.107Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1765568361579,
+    "type": "medical",
+    "text": "critical situation",
+    "location": "sydney",
+    "coordinates": [
+      -33.8698439,
+      151.2082848
+    ],
+    "timestamp": "2025-12-12T19:39:21.579Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1765568428090,
+    "type": "other",
+    "text": "mhv",
+    "location": "sydney",
+    "coordinates": [
+      -33.8698439,
+      151.2082848
+    ],
+    "timestamp": "2025-12-12T19:40:28.090Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "⚠️",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1765568511681,
+    "type": "medical",
+    "text": "vn",
+    "location": "sydney",
+    "coordinates": [
+      -33.8698439,
+      151.2082848
+    ],
+    "timestamp": "2025-12-12T19:41:51.681Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1765568673278,
+    "type": "medical",
+    "text": "ygy",
+    "location": "sydney",
+    "coordinates": [
+      -33.8698439,
+      151.2082848
+    ],
+    "timestamp": "2025-12-12T19:44:33.278Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1765568709527,
+    "type": "medical",
+    "text": "hh",
+    "location": "sydney",
+    "coordinates": [
+      -33.8698439,
+      151.2082848
+    ],
+    "timestamp": "2025-12-12T19:45:09.527Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1765568782270,
+    "type": "medical",
+    "text": "nvbvb",
+    "location": "sydney",
+    "coordinates": [
+      -33.8698439,
+      151.2082848
+    ],
+    "timestamp": "2025-12-12T19:46:22.270Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1765569058241,
+    "type": "medical",
+    "text": "mk",
+    "location": "sydney",
+    "coordinates": [
+      -33.8698439,
+      151.2082848
+    ],
+    "timestamp": "2025-12-12T19:50:58.241Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1765569069697,
+    "type": "medical",
+    "text": "jknkj",
+    "location": "sydney",
+    "coordinates": [
+      -33.8698439,
+      151.2082848
+    ],
+    "timestamp": "2025-12-12T19:51:09.697Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1765569087115,
+    "type": "medical",
+    "text": "jmjkk",
+    "location": "sydney",
+    "coordinates": [
+      -33.8698439,
+      151.2082848
+    ],
+    "timestamp": "2025-12-12T19:51:27.115Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1765569095365,
+    "type": "medical",
+    "text": "uujh",
+    "location": "sydney",
+    "coordinates": [
+      -33.8698439,
+      151.2082848
+    ],
+    "timestamp": "2025-12-12T19:51:35.365Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1765569331147,
+    "type": "medical",
+    "text": "fvf",
+    "location": "sydney",
+    "coordinates": [
+      -33.8698439,
+      151.2082848
+    ],
+    "timestamp": "2025-12-12T19:55:31.147Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1765633392137,
+    "type": "other",
+    "text": "ioyhio",
+    "location": "sydney",
+    "coordinates": [
+      -33.8698439,
+      151.2082848
+    ],
+    "timestamp": "2025-12-13T13:43:12.137Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "⚠️",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1765645723468,
+    "type": "medical",
+    "text": "koj",
+    "location": "sydney",
+    "coordinates": [
+      -33.8698439,
+      151.2082848
+    ],
+    "timestamp": "2025-12-13T17:08:43.468Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1765645739591,
+    "type": "medical",
+    "text": "uyy",
+    "location": "sydney",
+    "coordinates": [
+      -33.8698439,
+      151.2082848
+    ],
+    "timestamp": "2025-12-13T17:08:59.591Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1765645819888,
+    "type": "medical",
+    "text": "jfhjvhvk",
+    "location": "sydney",
+    "coordinates": [
+      -33.8698439,
+      151.2082848
+    ],
+    "timestamp": "2025-12-13T17:10:19.888Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1765645837307,
+    "type": "medical",
+    "text": "fgvjhvk",
+    "location": "sydney",
+    "coordinates": [
+      -33.8698439,
+      151.2082848
+    ],
+    "timestamp": "2025-12-13T17:10:37.307Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1765646043905,
+    "type": "medical",
+    "text": "fbx",
+    "location": "sydney",
+    "coordinates": [
+      -33.8698439,
+      151.2082848
+    ],
+    "timestamp": "2025-12-13T17:14:03.905Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1765726631158,
+    "type": "other",
+    "text": "tugykug",
+    "location": "sydney",
+    "coordinates": [
+      -33.8698439,
+      151.2082848
+    ],
+    "timestamp": "2025-12-14T15:37:11.158Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "⚠️",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1765736886619,
+    "type": "medical",
+    "text": "dfgbng",
+    "location": "sydney",
+    "coordinates": [
+      -33.8698439,
+      151.2082848
+    ],
+    "timestamp": "2025-12-14T18:28:06.619Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1765736906120,
+    "type": "medical",
+    "text": "fgj",
+    "location": "sydney",
+    "coordinates": [
+      -33.8698439,
+      151.2082848
+    ],
+    "timestamp": "2025-12-14T18:28:26.120Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1765737292787,
+    "type": "medical",
+    "text": "gkkg",
+    "location": "sydney",
+    "coordinates": [
+      0,
+      0
+    ],
+    "timestamp": "2025-12-14T18:34:52.787Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1765737322478,
+    "type": "medical",
+    "text": "iugg",
+    "location": "sydney",
+    "coordinates": [
+      0,
+      0
+    ],
+    "timestamp": "2025-12-14T18:35:22.478Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1765737856297,
+    "type": "other",
+    "text": "jgku",
+    "location": "sydney",
+    "coordinates": [
+      -33.8698439,
+      151.2082848
+    ],
+    "timestamp": "2025-12-14T18:44:16.297Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "⚠️",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1765737866486,
+    "type": "medical",
+    "text": "fj",
+    "location": "sydney",
+    "coordinates": [
+      0,
+      0
+    ],
+    "timestamp": "2025-12-14T18:44:26.486Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
+  },
+  {
+    "id": 1765738437660,
+    "type": "medical",
+    "text": "xf",
+    "location": "sydney",
+    "coordinates": [
+      -33.8698439,
+      151.2082848
+    ],
+    "timestamp": "2025-12-14T18:53:57.660Z",
+    "status": "pending",
+    "severity": "medium",
+    "peopleAffected": 0,
+    "icon": "🚑",
+    "reporter": "anonymous"
   }
 ]
