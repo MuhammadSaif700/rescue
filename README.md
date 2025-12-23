@@ -86,7 +86,7 @@ client\index.html
 - USGS
 - ReliefWeb
 
-## Demo
+## 🎥 Demo
 
 [![Watch the video](demo-thumbnail.png)](https://github.com/user-attachments/assets/77bab367-0c9f-4b75-a96d-f6a9bb7b7d37)
 
