@@ -4,7 +4,8 @@
   "description": "RescueEye Global - AI-Powered Disaster Detection & Emergency Reporting System",
   "private": true,
   "scripts": {
-    "start": "start index.html"
+    "start": "start index.html",
+    "build": "node -e \"const fs=require('fs');fs.rmSync('dist',{recursive:true,force:true});fs.mkdirSync('dist');fs.cpSync('public','dist',{recursive:true});fs.copyFileSync('index.html','dist/index.html')\""
   },
   "dependencies": {}
 }
